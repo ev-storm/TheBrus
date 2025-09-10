@@ -2,12 +2,15 @@
 export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   devtools: { enabled: false },
-  css: [
-    "~/assets/css/fonts.css",
-    "~/assets/css/main.css",
-  ],
+  css: ["~/assets/css/fonts.css", "~/assets/css/main.css"],
   app: {
     head: {
+      script: [
+        {
+          src: "https://api-maps.yandex.ru/2.1/?apikey=7da41200-bb84-45a3-b01d-da796bbb5afb&lang=ru_RU",
+          type: "text/javascript",
+        },
+      ],
       link: [
         {
           rel: "preload",

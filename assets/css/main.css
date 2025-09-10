@@ -5,7 +5,7 @@
   --green: #61b76d;
   --tran: all 0.3s ease-in-out;
   /*font-size*/
-  --font-button: clamp(10px, 1vw, 12px);
+  --font-button: clamp(10px, 2vw, 18px);
   --font-menu: clamp(14px, 2.5vw, 18px);
   --fs-0: clamp(32px, 5vw, 72px);
   --fs-1: clamp(24px, 4vw, 48px);
@@ -89,11 +89,10 @@ select {
   background: var(--green);
   border-style: none;
   color: #fff;
-  padding: 4px 70px;
+  padding: 0px 70px;
   font-family: var(--font-primary);
   font-weight: 400;
   font-size: var(--font-button);
-  text-transform: uppercase;
   cursor: pointer;
   transition: var(--tran);
 }
@@ -101,46 +100,43 @@ select {
   background: #2c8f63;
 }
 
-input {
-  background: transparent;
-  border-style: solid;
-  border-width: 1px;
-  padding: 0px 50px;
-  font-size: var(--font-button);
-  border-color: var(--font);
+input,
+textarea,
+.form-project textarea {
   width: 100%;
-  border-radius: 40px;
-  margin: 10px 0;
+  padding: 4px 20px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0;
   color: var(--font);
+  font-family: var(--font-primary);
+  font-size: var(--fs-p);
+  font-weight: 400;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none;
+  margin: 0;
+  resize: none;
 }
 
-input::placeholder {
-  font-size: 13px;
-  font-weight: 500;
-  opacity: 0.8;
-  padding-left: 20px;
+input::placeholder,
+textarea::placeholder,
+.form-project textarea::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+  /* font-weight: 300; */
+  /* font-size: clamp(12px, 0.7vw, 15px); */
 }
 
-textarea {
-  background: transparent;
-  border-style: solid;
-  border-width: 1px;
-  padding: 20px 50px;
-  font-size: var(--font-button);
-  border-color: var(--font);
-  width: 100%;
-  border-radius: 40px;
-  margin: 10px 0;
-  color: var(--font);
-  resize: vertical;
-  min-height: 120px;
+input:focus,
+textarea:focus,
+.form-project textarea:focus {
+  border-color: var(--green);
+  background: rgba(255, 255, 255, 0.039);
 }
 
-textarea::placeholder {
-  font-size: 13px;
-  font-weight: 500;
-  opacity: 0.8;
-  padding-left: 20px;
+input:hover,
+textarea:hover,
+.form-project textarea:hover {
+  background: rgba(255, 255, 255, 0.039);
 }
 
 h1 {
