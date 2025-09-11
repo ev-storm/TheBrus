@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Тест фильтрации избранного</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 20px;
+        background: #1a1a1a;
+        color: white;
+      }
+      .test-section {
+        background: #2a2a2a;
+        padding: 20px;
+        margin: 20px 0;
+        border-radius: 8px;
+      }
+      .status {
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 4px;
+      }
+      .success {
+        background: #4caf50;
+      }
+      .error {
+        background: #f44336;
+      }
+      .info {
+        background: #2196f3;
+      }
+      .test-button {
+        background: #65c36c;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        margin: 5px;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      .test-button:hover {
+        background: #5ab060;
+      }
+      .favorites-list {
+        background: #333;
+        padding: 15px;
+        border-radius: 4px;
+        margin: 10px 0;
+      }
+      .card {
+        background: #444;
+        padding: 15px;
+        margin: 10px 0;
+        border-radius: 8px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+      }
+      .card.favorite {
+        border-color: #65c36c;
+        background: #3a4a3a;
+      }
+      .card.filtered-out {
+        display: none;
+      }
+      .like-button {
+        background: none;
+        border: none;
+        color: white;
+        cursor: pointer;
+        font-size: 20px;
+        transition: all 0.3s ease;
+      }
+      .like-button.liked {
+        color: #65c36c;
+        transform: scale(1.2);
+      }
+      .like-button:hover {
+        color: #65c36c;
+      }
+      .filter-toggle {
+        background: #ff9800;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        margin: 5px;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      .filter-toggle.active {
+        background: #65c36c;
+      }
+      .test-results {
+        background: #333;
+        padding: 15px;
+        border-radius: 4px;
+        margin: 10px 0;
+        font-family: monospace;
+        white-space: pre-wrap;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🔍 Тест фильтрации избранного</h1>
+
+    <div class="test-section">
+      <h2>📊 Статус системы</h2>
+      <div id="status" class="status info">Инициализация...</div>
+      <div class="favorites-list">
+        <strong>Избранное:</strong>
+        <span id="favorites-count">0</span> элементов
+        <div id="favorites-list"></div>
+      </div>
+      <button class="filter-toggle" id="filter-toggle" onclick="toggleFilter()">
+        Показать только избранное
+      </button>
+    </div>
+
+    <div class="test-section">
+      <h2>🏠 Тестовые карточки</h2>
+      <div id="cards-container">
+        <!-- Карточки будут добавлены динамически -->
+      </div>
+    </div>
+
+    <div class="test-section">
+      <h2>🧪 Тесты фильтрации</h2>
+      <button class="test-button" onclick="runFilterTests()">
+        Запустить тесты фильтрации
+      </button>
+      <button class="test-button" onclick="clearFavorites()">
+        Очистить избранное
+      </button>
+      <button class="test-button" onclick="addTestCards()">
+        Добавить тестовые карточки
+      </button>
+      <div id="test-results" class="test-results"></div>
+    </div>
+
+    <script>
+      // Симуляция useFavorites с cookies
+      class FavoritesManager {
+        constructor() {
+          this.cookieName = "favorites";
+          this.favorites = this.loadFromCookie();
+          this.filterEnabled = false;
+          this.updateDisplay();
+        }
+
+        loadFromCookie() {
+          try {
+            const cookie = document.cookie
+              .split("; ")
+              .find((row) => row.startsWith(this.cookieName + "="));
+            if (cookie) {
+              const value = cookie.split("=")[1];
+              return JSON.parse(decodeURIComponent(value));
+            }
+          } catch (e) {
+            console.error("Ошибка загрузки из cookie:", e);
+          }
+          return [];
+        }
+
+        saveToCookie() {
+          try {
+            const value = encodeURIComponent(JSON.stringify(this.favorites));
+            document.cookie = `${this.cookieName}=${value}; max-age=${
+              60 * 60 * 24 * 365
+            }; path=/; samesite=lax`;
+          } catch (e) {
+            console.error("Ошибка сохранения в cookie:", e);
+          }
+        }
+
+        toggleFavorite(itemId) {
+          const index = this.favorites.indexOf(itemId);
+          if (index > -1) {
+            this.favorites.splice(index, 1);
+            console.log("Удалено из избранного:", itemId);
+          } else {
+            this.favorites.push(itemId);
+            console.log("Добавлено в избранное:", itemId);
+          }
+          this.saveToCookie();
+          this.updateDisplay();
+          this.updateCards();
+        }
+
+        isFavorite(itemId) {
+          return this.favorites.includes(itemId);
+        }
+
+        getFavoritesCount() {
+          return this.favorites.length;
+        }
+
+        clearFavorites() {
+          this.favorites = [];
+          this.saveToCookie();
+          this.updateDisplay();
+          this.updateCards();
+        }
+
+        updateDisplay() {
+          document.getElementById("favorites-count").textContent =
+            this.getFavoritesCount();
+          const list = document.getElementById("favorites-list");
+          list.innerHTML =
+            this.favorites.length > 0
+              ? this.favorites.map((id) => `<div>• ${id}</div>`).join("")
+              : "<div>Пусто</div>";
+        }
+
+        updateCards() {
+          const cards = document.querySelectorAll(".card");
+          cards.forEach((card) => {
+            const cardId = card.dataset.cardId;
+            const likeButton = card.querySelector(".like-button");
+            if (likeButton) {
+              const isLiked = this.isFavorite(cardId);
+              likeButton.classList.toggle("liked", isLiked);
+              card.classList.toggle("favorite", isLiked);
+
+              // Применяем фильтрацию
+              if (this.filterEnabled) {
+                card.classList.toggle("filtered-out", !isLiked);
+              } else {
+                card.classList.remove("filtered-out");
+              }
+            }
+          });
+        }
+
+        toggleFilter() {
+          this.filterEnabled = !this.filterEnabled;
+          const button = document.getElementById("filter-toggle");
+          button.textContent = this.filterEnabled
+            ? "Показать все"
+            : "Показать только избранное";
+          button.classList.toggle("active", this.filterEnabled);
+          this.updateCards();
+
+          console.log(
+            `Фильтрация ${this.filterEnabled ? "включена" : "отключена"}`
+          );
+        }
+      }
+
+      const favoritesManager = new FavoritesManager();
+
+      function addTestCards() {
+        const container = document.getElementById("cards-container");
+        container.innerHTML = "";
+
+        const testCards = [
+          { id: "order-0", title: "Дом 1", price: "1000000", area: "120" },
+          { id: "order-1", title: "Дом 2", price: "2000000", area: "150" },
+          { id: "order-2", title: "Дом 3", price: "1500000", area: "100" },
+          {
+            id: "portfolio-0",
+            title: "Проект 1",
+            price: "3000000",
+            area: "200",
+          },
+          {
+            id: "portfolio-1",
+            title: "Проект 2",
+            price: "2500000",
+            area: "180",
+          },
+        ];
+
+        testCards.forEach((card) => {
+          const cardElement = document.createElement("div");
+          cardElement.className = "card";
+          cardElement.dataset.cardId = card.id;
+          cardElement.innerHTML = `
+                    <div>
+                        <strong>${card.title}</strong><br>
+                        <span>${card.price} ₽ • ${card.area} м²</span>
+                    </div>
+                    <button class="like-button" onclick="toggleFavorite('${card.id}')">♡</button>
+                `;
+          container.appendChild(cardElement);
+        });
+
+        favoritesManager.updateCards();
+      }
+
+      function toggleFavorite(cardId) {
+        favoritesManager.toggleFavorite(cardId);
+      }
+
+      function clearFavorites() {
+        favoritesManager.clearFavorites();
+      }
+
+      function toggleFilter() {
+        favoritesManager.toggleFilter();
+      }
+
+      function runFilterTests() {
+        const results = document.getElementById("test-results");
+        results.textContent = "Запуск тестов фильтрации...\n";
+
+        // Очищаем избранное для чистого теста
+        favoritesManager.clearFavorites();
+
+        // Добавляем несколько элементов в избранное
+        favoritesManager.toggleFavorite("order-0");
+        favoritesManager.toggleFavorite("order-2");
+
+        // Включаем фильтрацию
+        favoritesManager.toggleFilter();
+
+        setTimeout(() => {
+          const visibleCards = document.querySelectorAll(
+            ".card:not(.filtered-out)"
+          );
+          const expectedCount = 2; // order-0 и order-2
+
+          if (visibleCards.length === expectedCount) {
+            results.textContent += `✅ Фильтрация работает! Показано ${visibleCards.length} из 5 карточек\n`;
+          } else {
+            results.textContent += `❌ Ошибка фильтрации! Показано ${visibleCards.length}, ожидалось ${expectedCount}\n`;
+          }
+
+          // Выключаем фильтрацию
+          favoritesManager.toggleFilter();
+
+          setTimeout(() => {
+            const allCards = document.querySelectorAll(
+              ".card:not(.filtered-out)"
+            );
+            if (allCards.length === 5) {
+              results.textContent += `✅ Отключение фильтрации работает! Показано ${allCards.length} карточек\n`;
+            } else {
+              results.textContent += `❌ Ошибка отключения фильтрации! Показано ${allCards.length}, ожидалось 5\n`;
+            }
+          }, 100);
+        }, 100);
+      }
+
+      // Инициализация
+      document.addEventListener("DOMContentLoaded", () => {
+        const status = document.getElementById("status");
+        status.textContent = "✅ Система фильтрации готова к работе";
+        status.className = "status success";
+
+        addTestCards();
+      });
+    </script>
+  </body>
+</html>

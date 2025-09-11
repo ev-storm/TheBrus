@@ -3,12 +3,21 @@ export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   devtools: { enabled: false },
   css: ["~/assets/css/fonts.css", "~/assets/css/main.css"],
+  runtimeConfig: {
+    ymapsApiKey:
+      process.env.YMAPS_API_KEY || "2daa9fb2-779c-4369-b15e-8ba3c97897c5",
+    public: {
+      ymapsApiKey:
+        process.env.YMAPS_API_KEY || "2daa9fb2-779c-4369-b15e-8ba3c97897c5",
+    },
+  },
   app: {
     head: {
       script: [
         {
-          src: "https://api-maps.yandex.ru/2.1/?apikey=7da41200-bb84-45a3-b01d-da796bbb5afb&lang=ru_RU",
+          src: "https://api-maps.yandex.ru/v3/?apikey=2daa9fb2-779c-4369-b15e-8ba3c97897c5&lang=ru_RU",
           type: "text/javascript",
+          async: true,
         },
       ],
       link: [

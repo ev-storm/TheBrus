@@ -34,6 +34,7 @@ import { useMenu } from "~/composables/useMenu";
 const isScrolled = ref(false);
 let lastScrollY = 0;
 let ticking = false;
+let blurTimeout = null;
 
 // Состояние бокового меню
 const isMenuOpen = ref(false);
@@ -63,14 +64,18 @@ const handleScroll = () => {
         return;
       }
 
-      // Если скроллим вверх (текущая позиция меньше предыдущей)
-      if (currentScrollY < lastScrollY) {
-        isScrolled.value = false; // Включаем blur
+      // При любом скролле активируем blur
+      isScrolled.value = false; // Включаем blur
+
+      // Очищаем предыдущий таймаут
+      if (blurTimeout) {
+        clearTimeout(blurTimeout);
       }
-      // Если скроллим вниз (текущая позиция больше предыдущей)
-      else if (currentScrollY > lastScrollY) {
-        isScrolled.value = true; // Выключаем blur
-      }
+
+      // Устанавливаем новый таймаут на 3 секунды
+      blurTimeout = setTimeout(() => {
+        isScrolled.value = true; // Выключаем blur через 3 секунды
+      }, 3000);
 
       lastScrollY = currentScrollY;
       ticking = false;
@@ -92,6 +97,10 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener("scroll", handleScroll);
   window.removeEventListener("toggleMenu", handleToggleMenuEvent);
+  // Очищаем таймаут при размонтировании
+  if (blurTimeout) {
+    clearTimeout(blurTimeout);
+  }
 });
 </script>
 
@@ -104,7 +113,7 @@ onUnmounted(() => {
   z-index: 999;
   background: transparent;
   backdrop-filter: blur(150px);
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
   will-change: backdrop-filter;
 }
 

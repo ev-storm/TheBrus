@@ -1,0 +1,50 @@
+[
+  {
+    "name": "Название Проекта 1",
+    "price": 9580652,
+    "area": 425,
+    "img1": "/img/catalog/order/1.png",
+    "img2": "/img/catalog/order/2.png",
+    "img3": "/img/catalog/order/3.png"
+  },
+  {
+    "name": "Название Проекта 2",
+    "price": 7340000,
+    "area": 310,
+    "img1": "/img/catalog/order/2.png",
+    "img2": "/img/catalog/order/3.png",
+    "img3": "/img/catalog/order/1.png"
+  },
+  {
+    "name": "Название Проекта 3",
+    "price": 5820000,
+    "area": 240,
+    "img1": "/img/catalog/order/3.png",
+    "img2": "/img/catalog/order/1.png",
+    "img3": "/img/catalog/order/2.png"
+  },
+  {
+    "name": "Название Проекта 4",
+    "price": 10490000,
+    "area": 460,
+    "img1": "/img/catalog/order/1.png",
+    "img2": "/img/catalog/order/2.png",
+    "img3": "/img/catalog/order/3.png"
+  },
+  {
+    "name": "Название Проекта 5",
+    "price": 6890000,
+    "area": 275,
+    "img1": "/img/catalog/order/2.png",
+    "img2": "/img/catalog/order/1.png",
+    "img3": "/img/catalog/order/3.png"
+  },
+  {
+    "name": "Название Проекта 6",
+    "price": 7990000,
+    "area": 300,
+    "img1": "/img/catalog/order/3.png",
+    "img2": "/img/catalog/order/2.png",
+    "img3": "/img/catalog/order/1.png"
+  }
+]

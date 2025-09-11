@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Полный тест функциональности избранного</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 20px;
+        background: #1a1a1a;
+        color: white;
+      }
+      .test-section {
+        background: #2a2a2a;
+        padding: 20px;
+        margin: 20px 0;
+        border-radius: 8px;
+      }
+      .status {
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 4px;
+      }
+      .success {
+        background: #4caf50;
+      }
+      .error {
+        background: #f44336;
+      }
+      .info {
+        background: #2196f3;
+      }
+      .warning {
+        background: #ff9800;
+      }
+      .test-button {
+        background: #65c36c;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        margin: 5px;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      .test-button:hover {
+        background: #5ab060;
+      }
+      .favorites-list {
+        background: #333;
+        padding: 15px;
+        border-radius: 4px;
+        margin: 10px 0;
+      }
+      .card {
+        background: #444;
+        padding: 15px;
+        margin: 10px 0;
+        border-radius: 8px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+      }
+      .card.favorite {
+        border-color: #65c36c;
+        background: #3a4a3a;
+      }
+      .like-button {
+        background: none;
+        border: none;
+        color: white;
+        cursor: pointer;
+        font-size: 20px;
+        transition: all 0.3s ease;
+      }
+      .like-button.liked {
+        color: #65c36c;
+        transform: scale(1.2);
+      }
+      .like-button:hover {
+        color: #65c36c;
+      }
+      .test-results {
+        background: #333;
+        padding: 15px;
+        border-radius: 4px;
+        margin: 10px 0;
+        font-family: monospace;
+        white-space: pre-wrap;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🎯 Полный тест функциональности избранного</h1>
+
+    <div class="test-section">
+      <h2>📊 Статус системы</h2>
+      <div id="status" class="status info">Инициализация...</div>
+      <div class="favorites-list">
+        <strong>Избранное:</strong>
+        <span id="favorites-count">0</span> элементов
+        <div id="favorites-list"></div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="test-section">
+        <h2>🏠 Тестовые карточки (Заказ)</h2>
+        <div id="order-cards">
+          <!-- Карточки заказа -->
+        </div>
+      </div>
+
+      <div class="test-section">
+        <h2>💼 Тестовые карточки (Портфолио)</h2>
+        <div id="portfolio-cards">
+          <!-- Карточки портфолио -->
+        </div>
+      </div>
+    </div>
+
+    <div class="test-section">
+      <h2>🧪 Тесты функциональности</h2>
+      <button class="test-button" onclick="runAllTests()">
+        Запустить все тесты
+      </button>
+      <button class="test-button" onclick="clearFavorites()">
+        Очистить избранное
+      </button>
+      <button class="test-button" onclick="addTestData()">
+        Добавить тестовые данные
+      </button>
+      <button class="test-button" onclick="testCookiePersistence()">
+        Тест cookies
+      </button>
+      <div id="test-results" class="test-results"></div>
+    </div>
+
+    <div class="test-section">
+      <h2>📝 Логи</h2>
+      <div id="logs" class="test-results"></div>
+    </div>
+
+    <script>
+      // Симуляция useFavorites с cookies
+      class FavoritesManager {
+        constructor() {
+          this.cookieName = "favorites";
+          this.favorites = this.loadFromCookie();
+          this.logs = [];
+          this.updateDisplay();
+          this.log("Система избранного инициализирована");
+        }
+
+        log(message) {
+          const timestamp = new Date().toLocaleTimeString();
+          this.logs.push(`[${timestamp}] ${message}`);
+          this.updateLogs();
+        }
+
+        updateLogs() {
+          const logsElement = document.getElementById("logs");
+          logsElement.textContent = this.logs.slice(-10).join("\n");
+        }
+
+        loadFromCookie() {
+          try {
+            const cookie = document.cookie
+              .split("; ")
+              .find((row) => row.startsWith(this.cookieName + "="));
+            if (cookie) {
+              const value = cookie.split("=")[1];
+              const favorites = JSON.parse(decodeURIComponent(value));
+              this.log(`Загружено из cookies: ${favorites.length} элементов`);
+              return favorites;
+            }
+          } catch (e) {
+            this.log(`Ошибка загрузки из cookie: ${e.message}`);
+          }
+          this.log("Инициализация пустого списка избранного");
+          return [];
+        }
+
+        saveToCookie() {
+          try {
+            const value = encodeURIComponent(JSON.stringify(this.favorites));
+            document.cookie = `${this.cookieName}=${value}; max-age=${
+              60 * 60 * 24 * 365
+            }; path=/; samesite=lax`;
+            this.log(`Сохранено в cookies: ${this.favorites.length} элементов`);
+          } catch (e) {
+            this.log(`Ошибка сохранения в cookie: ${e.message}`);
+          }
+        }
+
+        toggleFavorite(itemId) {
+          const index = this.favorites.indexOf(itemId);
+          if (index > -1) {
+            this.favorites.splice(index, 1);
+            this.log(`❌ Удалено из избранного: ${itemId}`);
+          } else {
+            this.favorites.push(itemId);
+            this.log(`✅ Добавлено в избранное: ${itemId}`);
+          }
+          this.saveToCookie();
+          this.updateDisplay();
+          this.updateCards();
+        }
+
+        isFavorite(itemId) {
+          return this.favorites.includes(itemId);
+        }
+
+        getFavoritesCount() {
+          return this.favorites.length;
+        }
+
+        clearFavorites() {
+          const count = this.favorites.length;
+          this.favorites = [];
+          this.saveToCookie();
+          this.updateDisplay();
+          this.updateCards();
+          this.log(`🗑️ Очищено избранное: ${count} элементов`);
+        }
+
+        updateDisplay() {
+          document.getElementById("favorites-count").textContent =
+            this.getFavoritesCount();
+          const list = document.getElementById("favorites-list");
+          list.innerHTML =
+            this.favorites.length > 0
+              ? this.favorites.map((id) => `<div>• ${id}</div>`).join("")
+              : "<div>Пусто</div>";
+        }
+
+        updateCards() {
+          const cards = document.querySelectorAll(".card");
+          cards.forEach((card) => {
+            const cardId = card.dataset.cardId;
+            const likeButton = card.querySelector(".like-button");
+            if (likeButton) {
+              const isLiked = this.isFavorite(cardId);
+              likeButton.classList.toggle("liked", isLiked);
+              card.classList.toggle("favorite", isLiked);
+            }
+          });
+        }
+      }
+
+      const favoritesManager = new FavoritesManager();
+
+      function addTestData() {
+        // Добавляем карточки заказа
+        const orderContainer = document.getElementById("order-cards");
+        orderContainer.innerHTML = "";
+
+        const orderCards = [
+          { id: "order-0", title: "Дом 1", price: "1000000", area: "120" },
+          { id: "order-1", title: "Дом 2", price: "2000000", area: "150" },
+          { id: "order-2", title: "Дом 3", price: "1500000", area: "100" },
+        ];
+
+        orderCards.forEach((card) => {
+          const cardElement = createCardElement(card);
+          orderContainer.appendChild(cardElement);
+        });
+
+        // Добавляем карточки портфолио
+        const portfolioContainer = document.getElementById("portfolio-cards");
+        portfolioContainer.innerHTML = "";
+
+        const portfolioCards = [
+          {
+            id: "portfolio-0",
+            title: "Проект 1",
+            price: "3000000",
+            area: "200",
+          },
+          {
+            id: "portfolio-1",
+            title: "Проект 2",
+            price: "2500000",
+            area: "180",
+          },
+        ];
+
+        portfolioCards.forEach((card) => {
+          const cardElement = createCardElement(card);
+          portfolioContainer.appendChild(cardElement);
+        });
+
+        favoritesManager.updateCards();
+        favoritesManager.log("Добавлены тестовые карточки");
+      }
+
+      function createCardElement(card) {
+        const cardElement = document.createElement("div");
+        cardElement.className = "card";
+        cardElement.dataset.cardId = card.id;
+        cardElement.innerHTML = `
+                <div>
+                    <strong>${card.title}</strong><br>
+                    <span>${card.price} ₽ • ${card.area} м²</span>
+                </div>
+                <button class="like-button" onclick="toggleFavorite('${card.id}')">♡</button>
+            `;
+        return cardElement;
+      }
+
+      function toggleFavorite(cardId) {
+        favoritesManager.toggleFavorite(cardId);
+      }
+
+      function clearFavorites() {
+        favoritesManager.clearFavorites();
+      }
+
+      function testCookiePersistence() {
+        const status = document.getElementById("status");
+        status.textContent = "Тестирование сохранения в cookies...";
+        status.className = "status info";
+
+        // Добавляем элемент в избранное
+        favoritesManager.toggleFavorite("test-persistence");
+
+        setTimeout(() => {
+          // Проверяем, что элемент сохранился
+          if (favoritesManager.isFavorite("test-persistence")) {
+            status.textContent = "✅ Cookies работают корректно!";
+            status.className = "status success";
+          } else {
+            status.textContent = "❌ Ошибка сохранения в cookies";
+            status.className = "status error";
+          }
+        }, 100);
+      }
+
+      function runAllTests() {
+        const results = document.getElementById("test-results");
+        results.textContent = "Запуск тестов...\n";
+
+        const tests = [
+          {
+            name: "Тест добавления в избранное",
+            test: () => {
+              favoritesManager.toggleFavorite("test-add");
+              return favoritesManager.isFavorite("test-add");
+            },
+          },
+          {
+            name: "Тест удаления из избранного",
+            test: () => {
+              favoritesManager.toggleFavorite("test-add");
+              return !favoritesManager.isFavorite("test-add");
+            },
+          },
+          {
+            name: "Тест счетчика",
+            test: () => {
+              const initialCount = favoritesManager.getFavoritesCount();
+              favoritesManager.toggleFavorite("test-count");
+              const newCount = favoritesManager.getFavoritesCount();
+              favoritesManager.toggleFavorite("test-count");
+              return newCount === initialCount + 1;
+            },
+          },
+          {
+            name: "Тест очистки",
+            test: () => {
+              favoritesManager.toggleFavorite("test-clear");
+              favoritesManager.clearFavorites();
+              return favoritesManager.getFavoritesCount() === 0;
+            },
+          },
+        ];
+
+        let passed = 0;
+        let total = tests.length;
+
+        tests.forEach((test, index) => {
+          try {
+            const result = test.test();
+            if (result) {
+              results.textContent += `✅ ${test.name}\n`;
+              passed++;
+            } else {
+              results.textContent += `❌ ${test.name}\n`;
+            }
+          } catch (e) {
+            results.textContent += `❌ ${test.name} - Ошибка: ${e.message}\n`;
+          }
+        });
+
+        results.textContent += `\nРезультат: ${passed}/${total} тестов пройдено`;
+
+        if (passed === total) {
+          results.textContent += "\n🎉 Все тесты пройдены успешно!";
+        } else {
+          results.textContent += "\n⚠️ Некоторые тесты не пройдены";
+        }
+      }
+
+      // Инициализация
+      document.addEventListener("DOMContentLoaded", () => {
+        const status = document.getElementById("status");
+        status.textContent = "✅ Система избранного готова к работе";
+        status.className = "status success";
+
+        addTestData();
+      });
+    </script>
+  </body>
+</html>

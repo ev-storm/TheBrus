@@ -1,7 +1,9 @@
 <template>
   <div class="main-container">
-    <h1>Контакты</h1>
-    <p>Свяжитесь с нами</p>
+    <div class="b1">
+      <img src="/public/img/work.svg" alt="" />
+    </div>
+    <TestMap />
   </div>
 </template>
 
@@ -24,3 +26,16 @@ useHead({
   ],
 });
 </script>
+
+<style scoped>
+.b1 {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.b1 svg {
+  width: 300px;
+}
+</style>

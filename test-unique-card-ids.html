@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Тест уникальных ID карточек</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        background: #1a1a1a;
+        color: white;
+      }
+      .test-section {
+        background: #2a2a2a;
+        padding: 20px;
+        margin: 20px 0;
+        border-radius: 8px;
+      }
+      .status {
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 4px;
+      }
+      .success {
+        background: #4caf50;
+      }
+      .error {
+        background: #f44336;
+      }
+      .info {
+        background: #2196f3;
+      }
+      .test-button {
+        background: #65c36c;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        margin: 5px;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      .test-button:hover {
+        background: #5ab060;
+      }
+      .card {
+        background: #444;
+        padding: 15px;
+        margin: 10px 0;
+        border-radius: 8px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+      }
+      .card.favorite {
+        border-color: #65c36c;
+        background: #3a4a3a;
+      }
+      .like-button {
+        background: none;
+        border: none;
+        color: white;
+        cursor: pointer;
+        font-size: 20px;
+        transition: all 0.3s ease;
+      }
+      .like-button.liked {
+        color: #65c36c;
+        transform: scale(1.2);
+      }
+      .like-button:hover {
+        color: #65c36c;
+      }
+      .test-results {
+        background: #333;
+        padding: 15px;
+        border-radius: 4px;
+        margin: 10px 0;
+        font-family: monospace;
+        white-space: pre-wrap;
+      }
+      .sort-buttons {
+        display: flex;
+        gap: 10px;
+        margin: 10px 0;
+      }
+      .sort-button {
+        background: #ff9800;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      .sort-button.active {
+        background: #65c36c;
+      }
+      .id-display {
+        font-size: 12px;
+        color: #888;
+        margin-top: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🔑 Тест уникальных ID карточек</h1>
+
+    <div class="test-section">
+      <h2>📊 Статус системы</h2>
+      <div id="status" class="status info">Инициализация...</div>
+      <div class="favorites-list">
+        <strong>Избранное:</strong>
+        <span id="favorites-count">0</span> элементов
+        <div id="favorites-list"></div>
+      </div>
+    </div>
+
+    <div class="test-section">
+      <h2>🔄 Тест сортировки с сохранением лайков</h2>
+      <div class="sort-buttons">
+        <button class="sort-button" onclick="sortBy('name')">По имени</button>
+        <button class="sort-button" onclick="sortBy('price-asc')">
+          По цене ↑
+        </button>
+        <button class="sort-button" onclick="sortBy('price-desc')">
+          По цене ↓
+        </button>
+        <button class="sort-button" onclick="sortBy('area-asc')">
+          По площади ↑
+        </button>
+        <button class="sort-button" onclick="sortBy('area-desc')">
+          По площади ↓
+        </button>
+      </div>
+      <div id="cards-container">
+        <!-- Карточки будут добавлены динамически -->
+      </div>
+    </div>
+
+    <div class="test-section">
+      <h2>🧪 Тесты функциональности</h2>
+      <button class="test-button" onclick="runUniqueIdTests()">
+        Запустить тесты уникальных ID
+      </button>
+      <button class="test-button" onclick="testSortingWithLikes()">
+        Тест сортировки с лайками
+      </button>
+      <button class="test-button" onclick="clearFavorites()">
+        Очистить избранное
+      </button>
+      <div id="test-results" class="test-results"></div>
+    </div>
+
+    <script>
+      // Симуляция useCardId
+      class CardIdManager {
+        getCardId(item, tab) {
+          if (!item || !tab) {
+            console.warn("CardIdManager: item или tab не определены", {
+              item,
+              tab,
+            });
+            return "unknown";
+          }
+          const baseId = `${tab}-${item.name}`;
+          const hash = item.price ? item.price.toString() : "0";
+          return `${baseId}-${hash}`;
+        }
+
+        parseCardId(cardId) {
+          if (!cardId) return null;
+          const parts = cardId.split("-");
+          if (parts.length < 2) return null;
+          return {
+            tab: parts[0],
+            name: parts.slice(1, -1).join("-"),
+            hash: parts[parts.length - 1],
+          };
+        }
+      }
+
+      // Симуляция useFavorites с cookies
+      class FavoritesManager {
+        constructor() {
+          this.cookieName = "favorites";
+          this.favorites = this.loadFromCookie();
+          this.cardIdManager = new CardIdManager();
+          this.currentSort = "name";
+          this.updateDisplay();
+        }
+
+        loadFromCookie() {
+          try {
+            const cookie = document.cookie
+              .split("; ")
+              .find((row) => row.startsWith(this.cookieName + "="));
+            if (cookie) {
+              const value = cookie.split("=")[1];
+              return JSON.parse(decodeURIComponent(value));
+            }
+          } catch (e) {
+            console.error("Ошибка загрузки из cookie:", e);
+          }
+          return [];
+        }
+
+        saveToCookie() {
+          try {
+            const value = encodeURIComponent(JSON.stringify(this.favorites));
+            document.cookie = `${this.cookieName}=${value}; max-age=${
+              60 * 60 * 24 * 365
+            }; path=/; samesite=lax`;
+          } catch (e) {
+            console.error("Ошибка сохранения в cookie:", e);
+          }
+        }
+
+        toggleFavorite(cardId) {
+          const index = this.favorites.indexOf(cardId);
+          if (index > -1) {
+            this.favorites.splice(index, 1);
+            console.log("Удалено из избранного:", cardId);
+          } else {
+            this.favorites.push(cardId);
+            console.log("Добавлено в избранное:", cardId);
+          }
+          this.saveToCookie();
+          this.updateDisplay();
+          this.updateCards();
+        }
+
+        isFavorite(cardId) {
+          return this.favorites.includes(cardId);
+        }
+
+        getFavoritesCount() {
+          return this.favorites.length;
+        }
+
+        clearFavorites() {
+          this.favorites = [];
+          this.saveToCookie();
+          this.updateDisplay();
+          this.updateCards();
+        }
+
+        updateDisplay() {
+          document.getElementById("favorites-count").textContent =
+            this.getFavoritesCount();
+          const list = document.getElementById("favorites-list");
+          list.innerHTML =
+            this.favorites.length > 0
+              ? this.favorites.map((id) => `<div>• ${id}</div>`).join("")
+              : "<div>Пусто</div>";
+        }
+
+        updateCards() {
+          const cards = document.querySelectorAll(".card");
+          cards.forEach((card) => {
+            const cardId = card.dataset.cardId;
+            const likeButton = card.querySelector(".like-button");
+            if (likeButton) {
+              const isLiked = this.isFavorite(cardId);
+              likeButton.classList.toggle("liked", isLiked);
+              card.classList.toggle("favorite", isLiked);
+            }
+          });
+        }
+
+        sortItems(items, sortBy) {
+          const sortedItems = [...items];
+          this.currentSort = sortBy;
+
+          switch (sortBy) {
+            case "name":
+              return sortedItems.sort((a, b) => a.name.localeCompare(b.name));
+            case "price-asc":
+              return sortedItems.sort((a, b) => a.price - b.price);
+            case "price-desc":
+              return sortedItems.sort((a, b) => b.price - a.price);
+            case "area-asc":
+              return sortedItems.sort((a, b) => a.area - b.area);
+            case "area-desc":
+              return sortedItems.sort((a, b) => b.area - a.area);
+            default:
+              return sortedItems;
+          }
+        }
+      }
+
+      const favoritesManager = new FavoritesManager();
+
+      // Тестовые данные
+      const testData = [
+        { name: "Название Проекта 1", price: 9580652, area: 425 },
+        { name: "Название Проекта 2", price: 7340000, area: 310 },
+        { name: "Название Проекта 3", price: 5820000, area: 240 },
+        { name: "Название Проекта 4", price: 10490000, area: 460 },
+        { name: "Название Проекта 5", price: 6890000, area: 275 },
+        { name: "Название Проекта 6", price: 7990000, area: 300 },
+      ];
+
+      function renderCards(items) {
+        const container = document.getElementById("cards-container");
+        container.innerHTML = "";
+
+        items.forEach((item) => {
+          const cardId = favoritesManager.cardIdManager.getCardId(
+            item,
+            "order"
+          );
+          const cardElement = document.createElement("div");
+          cardElement.className = "card";
+          cardElement.dataset.cardId = cardId;
+          cardElement.innerHTML = `
+                    <div>
+                        <strong>${item.name}</strong><br>
+                        <span>${item.price.toLocaleString()} ₽ • ${
+            item.area
+          } м²</span>
+                        <div class="id-display">ID: ${cardId}</div>
+                    </div>
+                    <button class="like-button" onclick="toggleFavorite('${cardId}')">♡</button>
+                `;
+          container.appendChild(cardElement);
+        });
+
+        favoritesManager.updateCards();
+      }
+
+      function sortBy(sortType) {
+        // Обновляем активную кнопку
+        document.querySelectorAll(".sort-button").forEach((btn) => {
+          btn.classList.remove("active");
+        });
+        event.target.classList.add("active");
+
+        // Сортируем данные
+        const sortedItems = favoritesManager.sortItems(testData, sortType);
+        renderCards(sortedItems);
+
+        console.log(
+          `Сортировка по ${sortType}:`,
+          sortedItems.map((item) => ({
+            name: item.name,
+            id: favoritesManager.cardIdManager.getCardId(item, "order"),
+          }))
+        );
+      }
+
+      function toggleFavorite(cardId) {
+        favoritesManager.toggleFavorite(cardId);
+      }
+
+      function clearFavorites() {
+        favoritesManager.clearFavorites();
+      }
+
+      function runUniqueIdTests() {
+        const results = document.getElementById("test-results");
+        results.textContent = "Запуск тестов уникальных ID...\n";
+
+        let passed = 0;
+        let total = 0;
+
+        // Тест 1: Уникальность ID
+        total++;
+        const ids = testData.map((item) =>
+          favoritesManager.cardIdManager.getCardId(item, "order")
+        );
+        const uniqueIds = new Set(ids);
+        if (uniqueIds.size === ids.length) {
+          results.textContent += "✅ ID карточек уникальны\n";
+          passed++;
+        } else {
+          results.textContent += "❌ Найдены дублирующиеся ID\n";
+        }
+
+        // Тест 2: Стабильность ID при сортировке
+        total++;
+        const originalIds = testData.map((item) =>
+          favoritesManager.cardIdManager.getCardId(item, "order")
+        );
+        const sortedData = favoritesManager.sortItems(testData, "price-asc");
+        const sortedIds = sortedData.map((item) =>
+          favoritesManager.cardIdManager.getCardId(item, "order")
+        );
+
+        const originalSet = new Set(originalIds);
+        const sortedSet = new Set(sortedIds);
+        const setsEqual =
+          originalSet.size === sortedSet.size &&
+          [...originalSet].every((id) => sortedSet.has(id));
+
+        if (setsEqual) {
+          results.textContent += "✅ ID остаются стабильными при сортировке\n";
+          passed++;
+        } else {
+          results.textContent += "❌ ID изменяются при сортировке\n";
+        }
+
+        // Тест 3: Парсинг ID
+        total++;
+        const testId = originalIds[0];
+        const parsed = favoritesManager.cardIdManager.parseCardId(testId);
+        if (parsed && parsed.tab === "order" && parsed.name) {
+          results.textContent += "✅ Парсинг ID работает корректно\n";
+          passed++;
+        } else {
+          results.textContent += "❌ Ошибка парсинга ID\n";
+        }
+
+        results.textContent += `\nРезультат: ${passed}/${total} тестов пройдено`;
+
+        if (passed === total) {
+          results.textContent += "\n🎉 Все тесты пройдены успешно!";
+        } else {
+          results.textContent += "\n⚠️ Некоторые тесты не пройдены";
+        }
+      }
+
+      function testSortingWithLikes() {
+        const results = document.getElementById("test-results");
+        results.textContent = "Тест сортировки с лайками...\n";
+
+        // Очищаем избранное
+        favoritesManager.clearFavorites();
+
+        // Добавляем лайки на первые 3 карточки
+        const firstThree = testData.slice(0, 3);
+        firstThree.forEach((item) => {
+          const cardId = favoritesManager.cardIdManager.getCardId(
+            item,
+            "order"
+          );
+          favoritesManager.toggleFavorite(cardId);
+        });
+
+        results.textContent += `Добавлено в избранное: ${favoritesManager.getFavoritesCount()} карточек\n`;
+
+        // Сортируем по цене
+        const sortedItems = favoritesManager.sortItems(testData, "price-asc");
+        renderCards(sortedItems);
+
+        // Проверяем, что лайки сохранились
+        setTimeout(() => {
+          const likedCards = document.querySelectorAll(".card.favorite");
+          if (likedCards.length === 3) {
+            results.textContent += "✅ Лайки сохранились после сортировки!\n";
+          } else {
+            results.textContent += `❌ Ошибка: показано ${likedCards.length} лайков, ожидалось 3\n`;
+          }
+        }, 100);
+      }
+
+      // Инициализация
+      document.addEventListener("DOMContentLoaded", () => {
+        const status = document.getElementById("status");
+        status.textContent = "✅ Система уникальных ID готова к работе";
+        status.className = "status success";
+
+        renderCards(testData);
+      });
+    </script>
+  </body>
+</html>

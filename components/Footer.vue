@@ -85,6 +85,7 @@ export default {
   width: 100%;
   display: flex;
   justify-content: center;
+  background: #00000033;
 }
 .footer {
   width: 100%;
@@ -92,7 +93,8 @@ export default {
   height: 30vh;
   max-width: 1700px;
   justify-content: space-between;
-  margin-top: 10vh;
+  margin-top: 5vh;
+  padding: 0 2%;
 }
 .footer-logo {
   width: 20%;
@@ -100,7 +102,7 @@ export default {
   flex-direction: column;
   justify-content: space-between;
   align-items: start;
-  padding: 2%;
+  padding: 1% 2%;
 }
 .footer-logo img {
   width: 80%;
@@ -118,6 +120,7 @@ export default {
 .sub-link {
   color: #a0a0a0;
   font-size: clamp(12px, 0.8vw, 15px);
+  font-weight: 400;
 }
 
 .nav-item {
@@ -132,6 +135,12 @@ export default {
 }
 .footer-form input {
   margin: 8px 0;
+  padding: 0 30px;
+}
+
+.footer-form input::placeholder {
+  margin: 8px 0;
+  font-size: clamp(14px, 0.8vw, 14px);
 }
 .footer-form button {
   width: 100%;

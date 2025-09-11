@@ -3,6 +3,7 @@
   --back: #1b1b1b;
   --font: #ffffff;
   --green: #61b76d;
+  --grey: #a9a9a9;
   --tran: all 0.3s ease-in-out;
   /*font-size*/
   --font-button: clamp(10px, 2vw, 18px);

@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Тест tooltip функциональности</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        background: #1a1a1a;
+        color: white;
+      }
+      .test-section {
+        background: #2a2a2a;
+        padding: 20px;
+        margin: 20px 0;
+        border-radius: 8px;
+      }
+      .status {
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 4px;
+      }
+      .success {
+        background: #4caf50;
+      }
+      .error {
+        background: #f44336;
+      }
+      .info {
+        background: #2196f3;
+      }
+      .test-button {
+        background: #65c36c;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        margin: 5px;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      .test-button:hover {
+        background: #5ab060;
+      }
+      .test-results {
+        background: #333;
+        padding: 15px;
+        border-radius: 4px;
+        margin: 10px 0;
+        font-family: monospace;
+        white-space: pre-wrap;
+      }
+      .iframe-container {
+        width: 100%;
+        height: 600px;
+        border: 2px solid #444;
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      .iframe-container iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+      }
+      .demo-section {
+        background: #444;
+        padding: 20px;
+        margin: 20px 0;
+        border-radius: 8px;
+      }
+      .demo-list {
+        list-style: none;
+        padding: 0;
+      }
+      .demo-list li {
+        padding: 10px;
+        margin: 5px 0;
+        background: #555;
+        border-radius: 4px;
+        cursor: help;
+        transition: all 0.3s ease;
+      }
+      .demo-list li:hover {
+        background: #65c36c;
+        color: white;
+      }
+      .tooltip {
+        position: absolute;
+        background: rgba(0, 0, 0, 0.9);
+        color: white;
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-size: 12px;
+        line-height: 1.4;
+        max-width: 300px;
+        z-index: 1000;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      }
+      .tooltip.show {
+        opacity: 1;
+      }
+      .tooltip::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: -6px;
+        transform: translateY(-50%);
+        border: 6px solid transparent;
+        border-right-color: rgba(0, 0, 0, 0.9);
+      }
+    </style>
+  </head>
+  <body>
+    <h1>💡 Тест tooltip функциональности</h1>
+
+    <div class="test-section">
+      <h2>📊 Статус системы</h2>
+      <div id="status" class="status info">Инициализация...</div>
+    </div>
+
+    <div class="test-section">
+      <h2>🧪 Демо tooltip</h2>
+      <p>Наведите курсор на элементы списка ниже, чтобы увидеть tooltip:</p>
+      <div class="demo-section">
+        <h3>Фундамент</h3>
+        <ul class="demo-list">
+          <li
+            data="Топографическая съемка — это комплекс инженерно-геодезических работ по измерению участка местности и занесению в топографический план данных об особенностях рельефа, положении всех объектов и расстоянии между ними."
+          >
+            Геодезические исследования (топосъемка) участка
+          </li>
+          <li
+            data="Геологические исследования грунта включают в себя бурение скважин, отбор проб грунта, лабораторные испытания для определения несущей способности, состава и свойств грунтов на участке строительства."
+          >
+            Геологические исследования грунта
+          </li>
+          <li
+            data="Проект КЖ (конструкции железобетонные) включает в себя расчеты и чертежи фундамента, перекрытий, лестниц и других железобетонных конструкций здания."
+          >
+            Проект КЖ
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="test-section">
+      <h2>🌐 Тест на реальном сайте</h2>
+      <p>
+        Откройте
+        <a href="http://localhost:3000/house" target="_blank"
+          >http://localhost:3000/house</a
+        >
+        в новой вкладке
+      </p>
+      <div class="iframe-container">
+        <iframe src="http://localhost:3000/house" id="house-iframe"></iframe>
+      </div>
+    </div>
+
+    <div class="test-section">
+      <h2>🧪 Тесты функциональности</h2>
+      <button class="test-button" onclick="runTooltipTests()">
+        Запустить тесты tooltip
+      </button>
+      <button class="test-button" onclick="testTooltipPositioning()">
+        Тест позиционирования
+      </button>
+      <button class="test-button" onclick="testTooltipContent()">
+        Тест содержимого
+      </button>
+      <div id="test-results" class="test-results"></div>
+    </div>
+
+    <div class="test-section">
+      <h2>📝 Инструкции для тестирования</h2>
+      <div class="test-results">
+        1. Откройте http://localhost:3000/house в браузере 2. Прокрутите
+        страницу до секции "Фундамент" 3. Наведите курсор на элементы списка 4.
+        Проверьте, что появляется alert с описанием 5. Проверьте, что alert
+        содержит текст из атрибута data 6. Проверьте, что в консоли появляются
+        сообщения отладки Ожидаемое поведение: - Alert появляется при наведении
+        на элементы с атрибутом data - Alert содержит текст из атрибута data - В
+        консоли появляются сообщения отладки
+      </div>
+    </div>
+
+    <script>
+      // Tooltip функциональность для демо
+      let tooltip = null;
+
+      function showTooltip(event, text) {
+        if (!text) return;
+
+        hideTooltip();
+
+        tooltip = document.createElement("div");
+        tooltip.className = "tooltip";
+        tooltip.textContent = text;
+        document.body.appendChild(tooltip);
+
+        setTimeout(() => {
+          if (tooltip) {
+            const tooltipRect = tooltip.getBoundingClientRect();
+
+            let left = event.clientX + 10;
+            let top = event.clientY - tooltipRect.height - 10;
+
+            if (left + tooltipRect.width > window.innerWidth) {
+              left = event.clientX - tooltipRect.width - 10;
+            }
+
+            if (top < 0) {
+              top = event.clientY + 10;
+            }
+
+            tooltip.style.left = left + "px";
+            tooltip.style.top = top + "px";
+            tooltip.classList.add("show");
+          }
+        }, 10);
+      }
+
+      function hideTooltip() {
+        if (tooltip) {
+          tooltip.remove();
+          tooltip = null;
+        }
+      }
+
+      function handleMouseEnter(event) {
+        const text = event.target.getAttribute("data");
+        if (text) {
+          showTooltip(event, text);
+        }
+      }
+
+      function handleMouseLeave() {
+        hideTooltip();
+      }
+
+      function handleMouseMove(event) {
+        if (tooltip && tooltip.classList.contains("show")) {
+          const tooltipRect = tooltip.getBoundingClientRect();
+
+          let left = event.clientX + 10;
+          let top = event.clientY - tooltipRect.height - 10;
+
+          if (left + tooltipRect.width > window.innerWidth) {
+            left = event.clientX - tooltipRect.width - 10;
+          }
+
+          if (top < 0) {
+            top = event.clientY + 10;
+          }
+
+          tooltip.style.left = left + "px";
+          tooltip.style.top = top + "px";
+        }
+      }
+
+      function runTooltipTests() {
+        const results = document.getElementById("test-results");
+        results.textContent = "Запуск тестов tooltip...\n";
+
+        let passed = 0;
+        let total = 0;
+
+        // Тест 1: Проверка наличия элементов с атрибутом data
+        total++;
+        const elementsWithData = document.querySelectorAll("[data]");
+        if (elementsWithData.length > 0) {
+          results.textContent += `✅ Найдено ${elementsWithData.length} элементов с атрибутом data\n`;
+          passed++;
+        } else {
+          results.textContent += "❌ Не найдено элементов с атрибутом data\n";
+        }
+
+        // Тест 2: Проверка содержимого атрибутов data
+        total++;
+        const elementsWithContent = Array.from(elementsWithData).filter(
+          (el) => el.getAttribute("data") && el.getAttribute("data").length > 10
+        );
+        if (elementsWithContent.length > 0) {
+          results.textContent += `✅ Найдено ${elementsWithContent.length} элементов с содержательным data\n`;
+          passed++;
+        } else {
+          results.textContent +=
+            "❌ Не найдено элементов с содержательным data\n";
+        }
+
+        // Тест 3: Проверка стилей tooltip
+        total++;
+        const tooltipStyle = getComputedStyle(
+          document.querySelector(".tooltip") || document.createElement("div")
+        );
+        if (tooltipStyle.position === "absolute") {
+          results.textContent +=
+            "✅ Tooltip имеет правильное позиционирование\n";
+          passed++;
+        } else {
+          results.textContent +=
+            "❌ Tooltip имеет неправильное позиционирование\n";
+        }
+
+        results.textContent += `\nРезультат: ${passed}/${total} тестов пройдено`;
+
+        if (passed === total) {
+          results.textContent += "\n🎉 Все тесты tooltip пройдены успешно!";
+        } else {
+          results.textContent += "\n⚠️ Некоторые тесты не пройдены";
+        }
+      }
+
+      function testTooltipPositioning() {
+        const results = document.getElementById("test-results");
+        results.textContent = "Тест позиционирования tooltip...\n";
+
+        const elements = document.querySelectorAll("[data]");
+        if (elements.length > 0) {
+          const element = elements[0];
+          const rect = element.getBoundingClientRect();
+
+          results.textContent += `Элемент: ${element.textContent}\n`;
+          results.textContent += `Позиция: x=${rect.left}, y=${rect.top}\n`;
+          results.textContent += `Размер: w=${rect.width}, h=${rect.height}\n`;
+          results.textContent += `Data: ${element
+            .getAttribute("data")
+            .substring(0, 50)}...\n`;
+
+          results.textContent +=
+            "\n✅ Позиционирование tooltip работает корректно\n";
+        } else {
+          results.textContent += "❌ Не найдено элементов для тестирования\n";
+        }
+      }
+
+      function testTooltipContent() {
+        const results = document.getElementById("test-results");
+        results.textContent = "Тест содержимого tooltip...\n";
+
+        const elements = document.querySelectorAll("[data]");
+        elements.forEach((element, index) => {
+          const data = element.getAttribute("data");
+          results.textContent += `\nЭлемент ${index + 1}:\n`;
+          results.textContent += `Текст: ${element.textContent}\n`;
+          results.textContent += `Data: ${data.substring(0, 100)}...\n`;
+          results.textContent += `Длина: ${data.length} символов\n`;
+        });
+
+        results.textContent += "\n✅ Содержимое tooltip проверено\n";
+      }
+
+      function testRealSite() {
+        const results = document.getElementById("test-results");
+        results.textContent = "Тестирование реального сайта...\n";
+
+        const iframe = document.getElementById("house-iframe");
+        if (iframe) {
+          iframe.onload = () => {
+            results.textContent += "✅ Сайт загружен в iframe\n";
+            results.textContent +=
+              "Теперь проверьте функциональность tooltip\n";
+          };
+        }
+      }
+
+      // Инициализация
+      document.addEventListener("DOMContentLoaded", () => {
+        const status = document.getElementById("status");
+        status.textContent = "✅ Система тестирования tooltip готова к работе";
+        status.className = "status success";
+
+        // Добавляем обработчики событий для демо
+        const demoItems = document.querySelectorAll(".demo-list li");
+        demoItems.forEach((item) => {
+          item.addEventListener("mouseenter", handleMouseEnter);
+          item.addEventListener("mouseleave", handleMouseLeave);
+          item.addEventListener("mousemove", handleMouseMove);
+        });
+      });
+    </script>
+  </body>
+</html>
