@@ -4,6 +4,20 @@
       <div class="slider-container">
         <img class="house-img" :src="currentImage" :alt="houseTitle" />
 
+        <!-- Левая кликабельная область для предыдущего изображения -->
+        <div
+          class="slider-nav-left"
+          @click="prevImage"
+          v-if="productImages.length > 1"
+        ></div>
+
+        <!-- Правая кликабельная область для следующего изображения -->
+        <div
+          class="slider-nav-right"
+          @click="nextImage"
+          v-if="productImages.length > 1"
+        ></div>
+
         <!-- Индикаторы -->
         <div class="slider-indicators" v-if="productImages.length > 1">
           <button
@@ -19,11 +33,31 @@
     <div class="b2">
       <div class="b2-title">
         <h1 class="house-title">{{ houseTitle || "Название Проекта" }}</h1>
-        <div>
+        <div class="house-title-btn">
           <button class="btn pdf" @click="downloadPDF" :disabled="!pdfUrl">
             Скачать презентацию
           </button>
-          <button class="btn">Заказать</button>
+          <button class="btn order-btn" @click="handleOrder">Заказать</button>
+          <div class="view" @click="openModal">
+            <svg
+              width="29"
+              height="16"
+              viewBox="0 0 29 16"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M20.0981 6.51556C20.0981 9.53023 17.6543 11.9741 14.6396 11.9741C11.6249 11.9741 9.18104 9.53023 9.18104 6.51556C9.18104 3.50089 11.6249 1.05701 14.6396 1.05701C17.6543 1.05701 20.0981 3.50089 20.0981 6.51556Z"
+                stroke="white"
+                stroke-width="1.3"
+              />
+              <path
+                d="M27.7844 8.03842C28.0391 8.24732 28.0271 8.64218 27.7584 8.83272C22.4524 12.5953 18.8943 14.6956 14.6398 14.6956C10.3589 14.6956 7.18713 13.2781 1.45403 8.81807C1.21033 8.62849 1.19762 8.26263 1.42628 8.05515C7.2541 2.76743 10.1187 0.83139 14.6398 0.83139C19.1459 0.83139 21.8692 3.18654 27.7844 8.03842Z"
+                stroke="white"
+                stroke-width="1.3"
+              />
+            </svg>
+          </div>
         </div>
       </div>
       <div class="b2-content">
@@ -255,6 +289,16 @@
       </div>
     </div>
   </div>
+
+  <!-- Модальное окно для просмотра изображений -->
+  <ImageModal
+    :isOpen="isModalOpen"
+    :images="productImages"
+    :initialIndex="modalImageIndex"
+    :alt="houseTitle"
+    @close="closeModal"
+    @update:isOpen="isModalOpen = $event"
+  />
 </template>
 
 <style scoped>
@@ -266,13 +310,16 @@
   align-items: center;
   overflow: hidden;
 }
+.house-title-btn {
+  display: flex;
+  align-items: center;
+}
 
 .slider-container {
   position: relative;
   width: 100%;
   height: 100%;
   overflow: hidden;
-  border-radius: 12px;
 }
 
 .b1 img {
@@ -310,6 +357,27 @@
 .indicator:hover {
   border-color: white;
 }
+
+/* Кликабельные области для навигации */
+.slider-nav-left,
+.slider-nav-right {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 50%;
+  z-index: 5;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.slider-nav-left {
+  left: 0;
+}
+
+.slider-nav-right {
+  right: 0;
+}
+
 .b2 {
   width: 100%;
   padding: 0 5%;
@@ -473,12 +541,36 @@
   content: url(/public/svg/cart/item/5.svg);
   margin-right: 20px;
 }
+
+/* Стили для кнопки view */
+.view {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-left: 10px;
+}
+
+.view svg {
+  transition: transform 0.3s ease;
+}
+
+.view:hover svg {
+  transform: scale(1.1);
+}
 </style>
 
 <script setup>
 import { computed, ref, onMounted, nextTick } from "vue";
 import { useRoute } from "vue-router";
 import productsData from "~/data/products.js";
+import ImageModal from "~/components/ImageModal.vue";
+import { useSelectedProject } from "~/composables/useSelectedProject";
+import { useMenu } from "~/composables/useMenu";
 
 const route = useRoute();
 
@@ -496,6 +588,14 @@ const productData = ref(null);
 // Слайдер изображений
 const currentImageIndex = ref(0);
 const productImages = ref([]);
+
+// Модальное окно
+const isModalOpen = ref(false);
+const modalImageIndex = ref(0);
+
+// Composables для заказа
+const { setSelectedProject } = useSelectedProject();
+const { openMenu } = useMenu("right");
 
 // Получаем данные конкретного продукта
 const getProductData = () => {
@@ -519,7 +619,13 @@ const getProductData = () => {
 // Получаем изображения конкретного продукта
 const getProductImages = () => {
   const product = getProductData();
-  return [product.img1, product.img2, product.img3].filter(Boolean);
+  return [
+    product.img1,
+    product.img2,
+    product.img3,
+    product.img4,
+    product.img5,
+  ].filter(Boolean);
 };
 
 // Инициализируем данные
@@ -555,6 +661,52 @@ onMounted(() => {
 const goToImage = (index) => {
   currentImageIndex.value = index;
 };
+
+// Функция перехода к следующему изображению
+const nextImage = () => {
+  if (productImages.value.length > 1) {
+    currentImageIndex.value =
+      (currentImageIndex.value + 1) % productImages.value.length;
+  }
+};
+
+// Функция перехода к предыдущему изображению
+const prevImage = () => {
+  if (productImages.value.length > 1) {
+    currentImageIndex.value =
+      currentImageIndex.value === 0
+        ? productImages.value.length - 1
+        : currentImageIndex.value - 1;
+  }
+};
+
+// Функции модального окна
+function openModal() {
+  isModalOpen.value = true;
+  modalImageIndex.value = currentImageIndex.value;
+}
+
+function closeModal() {
+  isModalOpen.value = false;
+}
+
+// Функция для обработки заказа
+function handleOrder() {
+  console.log("handleOrder вызвана");
+
+  // Устанавливаем выбранный проект
+  setSelectedProject({
+    title: houseTitle.value || "Название Проекта",
+    price: price.value || "9 700 000 ₽",
+    area: area.value || "203",
+  });
+
+  console.log("setSelectedProject выполнен");
+
+  // Открываем правое меню
+  openMenu();
+  console.log("openMenu вызвана");
+}
 
 // Функция скачивания PDF
 const downloadPDF = () => {

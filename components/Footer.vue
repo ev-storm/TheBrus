@@ -86,6 +86,7 @@ export default {
   display: flex;
   justify-content: center;
   background: #00000033;
+  overflow: hidden;
 }
 .footer {
   width: 100%;

@@ -1,6 +1,15 @@
 <template>
   <div class="form-nav">
     <form @submit.prevent="handleSubmit" class="form-container">
+      <div class="form-field" v-if="selectedProject">
+        <input
+          v-model="form.projectName"
+          type="text"
+          :placeholder="selectedProject.title"
+          class="form-input project-input"
+          readonly
+        />
+      </div>
       <div class="form-field">
         <input
           v-model="form.name"
@@ -37,10 +46,14 @@
 
 <script setup>
 import { ref } from "vue";
+import { useSelectedProject } from "~/composables/useSelectedProject";
+
+const { selectedProject } = useSelectedProject();
 
 const form = ref({
   name: "",
   phone: "",
+  projectName: "",
 });
 
 const isPolicyAccepted = ref(false);
@@ -127,5 +140,15 @@ const handleSubmit = () => {
 
 .form-input:hover {
   border-color: rgba(255, 255, 255, 0.4);
+}
+
+.project-input {
+  background: transparent !important;
+  border-color: transparent !important;
+}
+
+.project-input::placeholder {
+  color: #fff !important;
+  font-weight: 500;
 }
 </style>

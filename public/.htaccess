@@ -1,0 +1,24 @@
+# Запрет доступа ботам
+RewriteEngine On
+
+# Блокировка по User-Agent
+RewriteCond %{HTTP_USER_AGENT} (bot|crawler|spider|scraper|scanner|harvester|extractor) [NC]
+RewriteRule .* - [F,L]
+
+# Блокировка известных ботов
+RewriteCond %{HTTP_USER_AGENT} (Googlebot|Bingbot|YandexBot|Slurp|DuckDuckBot|Baiduspider|facebookexternalhit|Twitterbot|LinkedInBot|WhatsApp|TelegramBot) [NC]
+RewriteRule .* - [F,L]
+
+# Дополнительные заголовки для запрета индексации
+Header always set X-Robots-Tag "noindex, nofollow, noarchive, nosnippet, noimageindex"
+
+# Блокировка доступа к служебным файлам
+<Files "robots.txt">
+    Header set X-Robots-Tag "noindex, nofollow"
+</Files>
+
+# Блокировка доступа к конфигурационным файлам
+<FilesMatch "\.(htaccess|htpasswd|ini|log|sh|inc|bak)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>

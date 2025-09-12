@@ -2,16 +2,20 @@
 import { computed, ref } from "vue";
 import FavoritesButton from "./FavoritesButton.vue";
 import { useRouter } from "vue-router";
+import { useSelectedProject } from "~/composables/useSelectedProject";
+import { useMenu } from "~/composables/useMenu";
 
 const props = defineProps({
   title: { type: String, required: true },
   price: { type: [Number, String], required: true },
   area: { type: [Number, String], required: true },
-  // Один или три изображения. Если передан только img — используется для всех зон
+  // Изображения. Если передан только img — используется для всех зон
   img: { type: String, required: false },
   img1: { type: String, required: false },
   img2: { type: String, required: false },
   img3: { type: String, required: false },
+  img4: { type: String, required: false },
+  img5: { type: String, required: false },
   description: { type: String, required: false },
   pdf: { type: String, required: false },
   liked: { type: Boolean, default: false },
@@ -36,19 +40,66 @@ const images = computed(() => {
     props.img1 || fallback,
     props.img2 || fallback,
     props.img3 || fallback,
+    props.img4 || fallback,
+    props.img5 || fallback,
   ];
 });
 
 const router = useRouter();
+const { setSelectedProject } = useSelectedProject();
+const { openMenu } = useMenu("right");
 
 const hoveredIndex = ref(0);
 const currentImage = computed(() => images.value[hoveredIndex.value] || "");
+
+// Состояние модального окна
+const isModalOpen = ref(false);
+const modalImageIndex = ref(0);
+
+// Фильтруем изображения для модального окна (только существующие)
+const modalImages = computed(() => {
+  return images.value.filter((img) => img && img.trim() !== "");
+});
 
 function handleEnter(index) {
   hoveredIndex.value = index;
 }
 function handleLeave() {
   hoveredIndex.value = 0;
+}
+
+// Функции для модального окна
+function openModal() {
+  isModalOpen.value = true;
+  modalImageIndex.value = 0;
+  // Блокируем скролл страницы
+  document.body.style.overflow = "hidden";
+}
+
+function closeModal() {
+  isModalOpen.value = false;
+  // Восстанавливаем скролл страницы
+  document.body.style.overflow = "auto";
+}
+
+function nextModalImage() {
+  if (modalImages.value.length > 1) {
+    modalImageIndex.value =
+      (modalImageIndex.value + 1) % modalImages.value.length;
+  }
+}
+
+function prevModalImage() {
+  if (modalImages.value.length > 1) {
+    modalImageIndex.value =
+      modalImageIndex.value === 0
+        ? modalImages.value.length - 1
+        : modalImageIndex.value - 1;
+  }
+}
+
+function handleModalClick() {
+  closeModal();
 }
 
 function goToHouseDetails() {
@@ -65,6 +116,18 @@ function goToHouseDetails() {
     },
   });
 }
+
+function handleOrder() {
+  // Устанавливаем выбранный проект
+  setSelectedProject({
+    title: props.title,
+    price: props.price,
+    area: props.area,
+  });
+
+  // Открываем правое меню
+  openMenu();
+}
 </script>
 
 <template>
@@ -73,6 +136,7 @@ function goToHouseDetails() {
       class="image"
       :style="{ backgroundImage: `url(${currentImage})` }"
       @mouseleave="handleLeave"
+      @click="goToHouseDetails"
     >
       <div class="hover-zones">
         <div class="hover-zone left" @mouseenter="handleEnter(0)"></div>
@@ -92,17 +156,25 @@ function goToHouseDetails() {
       <div class="meta">
         <h3 class="title">{{ title }}</h3>
         <div>
-          <div class="price">{{ formattedPrice }}</div>
+          <div class="price">
+            {{ formattedPrice }}
+          </div>
           <div class="area">{{ area }} м²</div>
         </div>
       </div>
 
       <div class="actions">
         <button class="btn" @click="goToHouseDetails">Подробнее</button>
-        <div class="icons" v-if="!hideActions">
-          <button class="btn">Заказать</button>
+        <div class="icons">
+          <button
+            class="btn order-btn"
+            @click="handleOrder"
+            v-if="!hideActions"
+          >
+            Заказать
+          </button>
           <div>
-            <div class="plan">
+            <div class="plan" v-if="!hideActions">
               <svg
                 width="19"
                 height="18"
@@ -117,7 +189,7 @@ function goToHouseDetails() {
                 />
               </svg>
             </div>
-            <div class="view">
+            <div class="view" @click="openModal">
               <svg
                 width="29"
                 height="16"
@@ -137,7 +209,7 @@ function goToHouseDetails() {
                 />
               </svg>
             </div>
-            <ClientOnly>
+            <ClientOnly v-if="!hideActions">
               <FavoritesButton :cardId="cardId" />
               <template #fallback>
                 <div class="like">
@@ -162,6 +234,73 @@ function goToHouseDetails() {
       </div>
     </div>
   </div>
+
+  <!-- Модальное окно для просмотра изображений -->
+  <Teleport to="body">
+    <div v-if="isModalOpen" class="modal-overlay" @click="handleModalClick">
+      <div class="modal-container" @click.stop>
+        <!-- Левая кликабельная область -->
+        <div
+          class="modal-nav-left"
+          @click.stop="prevModalImage"
+          v-if="modalImages.length > 1"
+        ></div>
+
+        <!-- Правая кликабельная область -->
+        <div
+          class="modal-nav-right"
+          @click.stop="nextModalImage"
+          v-if="modalImages.length > 1"
+        ></div>
+
+        <!-- Изображение -->
+        <img
+          v-if="modalImages[modalImageIndex]"
+          :src="modalImages[modalImageIndex]"
+          :alt="title"
+          class="modal-image"
+        />
+
+        <!-- Стрелки навигации -->
+        <div class="modal-arrows" v-if="modalImages.length > 1">
+          <div class="modal-arrow-left" @click.stop="prevModalImage">
+            <svg
+              width="80"
+              height="80"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M15 18L9 12L15 6"
+                stroke="white"
+                stroke-width="1"
+                stroke-linecap="square"
+                stroke-linejoin="miter"
+              />
+            </svg>
+          </div>
+          <div class="modal-arrow-right" @click.stop="nextModalImage">
+            <svg
+              width="80"
+              height="80"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M9 18L15 12L9 6"
+                stroke="white"
+                stroke-width="1"
+                stroke-linecap="square"
+                stroke-linejoin="miter"
+              />
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </Teleport>
 </template>
 
 <style scoped>
@@ -174,6 +313,8 @@ function goToHouseDetails() {
   background-size: cover;
   background-position: center;
   position: relative;
+  cursor: pointer;
+  background: #ffffff0d;
 }
 .hover-zones {
   position: absolute;
@@ -221,6 +362,8 @@ function goToHouseDetails() {
 }
 .area {
   color: #b7b7b7;
+  font-weight: 400;
+  font-size: clamp(16px, 1.5vw, 20px);
 }
 .dots span {
   width: 8px;
@@ -252,10 +395,11 @@ function goToHouseDetails() {
 }
 .price {
   color: #65c36c;
-  font-size: clamp(16px, 2vw, 24px);
+
+  font-size: clamp(16px, 2vw, 28px);
 }
 .actions .btn {
-  font-size: clamp(10px, 1vw, 13px);
+  font-size: clamp(10px, 1vw, 15px);
   padding: 0;
   width: 100%;
 }
@@ -282,6 +426,7 @@ function goToHouseDetails() {
   display: flex;
   align-items: center;
   gap: 20px;
+  cursor: pointer;
 }
 .icons div svg {
   cursor: pointer;
@@ -301,5 +446,116 @@ function goToHouseDetails() {
 .icons img {
   height: 22px;
   opacity: 0.9;
+}
+
+/* Стили модального окна */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  backdrop-filter: blur(15px);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal-container {
+  position: relative;
+  width: auto;
+  height: 80vh;
+  max-width: 1500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: default;
+  transform: scale(0.9);
+  animation: scaleIn 0.3s ease-out forwards;
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.98);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.modal-image {
+  width: auto;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 0px;
+  cursor: default;
+}
+
+/* Кликабельные области для навигации */
+.modal-nav-left,
+.modal-nav-right {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 50%;
+  z-index: 5;
+  cursor: pointer;
+}
+
+.modal-nav-left {
+  left: 0;
+}
+
+.modal-nav-right {
+  right: 0;
+}
+
+/* Стрелки навигации */
+.modal-arrows {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
+  display: flex;
+  justify-content: space-between;
+  padding: 0 20px;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.modal-arrow-left,
+.modal-arrow-right {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0.3;
+  transition: opacity 0.1s ease-in-out, background-color 0.5s ease;
+  pointer-events: all;
+}
+
+/* Эффекты при наведении на левую/правую части */
+.modal-nav-left:hover ~ .modal-arrows .modal-arrow-left {
+  opacity: 1;
+}
+
+.modal-nav-right:hover ~ .modal-arrows .modal-arrow-right {
+  opacity: 1;
 }
 </style>

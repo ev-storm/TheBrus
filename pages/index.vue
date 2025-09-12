@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from "vue";
+import { ref, onMounted, onUnmounted, nextTick } from "vue";
 import YandexMap from "~/components/YandexMap.vue";
 
 // Главная страница
@@ -28,26 +28,103 @@ const images = [
   "/img/5.jpg",
 ];
 
+// Анимация баннера календаря
+const isBannerVisible = ref(false);
+const counterValue = ref(200);
+const b1Element = ref(null);
+
 let slideInterval = null;
+let observer = null;
 
 const nextImage = () => {
   currentImageIndex.value = (currentImageIndex.value + 1) % images.length;
 };
 
+// Анимация счетчика
+const animateCounter = () => {
+  const startValue = 200;
+  const endValue = 70;
+  const duration = 3000; // 4 секунды
+  const startTime = Date.now();
+
+  const updateCounter = () => {
+    const elapsed = Date.now() - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+
+    // Easing function для плавной анимации
+    const easeOutCubic = 1 - Math.pow(1 - progress, 3);
+    counterValue.value = Math.round(
+      startValue - (startValue - endValue) * easeOutCubic
+    );
+
+    if (progress < 1) {
+      requestAnimationFrame(updateCounter);
+    }
+  };
+
+  requestAnimationFrame(updateCounter);
+};
+
+// Сброс баннера и счетчика
+const resetBanner = () => {
+  isBannerVisible.value = false;
+  counterValue.value = 200;
+};
+
+// Настройка Intersection Observer
+const setupObserver = () => {
+  if (!b1Element.value) return;
+
+  observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) {
+          // Элемент вышел за пределы экрана
+          resetBanner();
+        } else {
+          // Элемент попал в область экрана
+          if (!isBannerVisible.value) {
+            // Запускаем анимацию баннера через 2 секунды
+            setTimeout(() => {
+              isBannerVisible.value = true;
+              // Запускаем анимацию счетчика с небольшой задержкой
+              setTimeout(animateCounter, 500);
+            }, 1000);
+          }
+        }
+      });
+    },
+    {
+      threshold: 0.1, // Срабатывает когда 10% элемента видно
+      rootMargin: "0px",
+    }
+  );
+
+  observer.observe(b1Element.value);
+};
+
 onMounted(() => {
   slideInterval = setInterval(nextImage, 10000); // 10 секунд
+
+  // Настраиваем observer для отслеживания видимости b1
+  nextTick(() => {
+    setupObserver();
+  });
 });
 
 onUnmounted(() => {
   if (slideInterval) {
     clearInterval(slideInterval);
   }
+  if (observer) {
+    observer.disconnect();
+  }
 });
 </script>
 
 <template>
   <div class="main-container">
-    <div class="b1">
+    <div class="b1" ref="b1Element">
       <div
         v-for="(image, index) in images"
         :key="index"
@@ -61,6 +138,15 @@ onUnmounted(() => {
           в котором живёт любовь
         </h1>
         <button class="btn trigger">Присоедениться</button>
+      </div>
+      <div class="banner-calendar" :class="{ visible: isBannerVisible }">
+        <p>До вашего готового дома осталось</p>
+        <div class="score">
+          <span>{{ Math.floor(counterValue / 100) }}</span>
+          <span>{{ Math.floor((counterValue % 100) / 10) }}</span>
+          <span>{{ counterValue % 10 }}</span>
+        </div>
+        <p>Дней</p>
       </div>
     </div>
     <div class="b2">
@@ -177,6 +263,7 @@ onUnmounted(() => {
 </template>
 <style scoped>
 .b1 {
+  position: relative;
   width: 100%;
   height: 100vh;
   display: flex;
@@ -185,7 +272,51 @@ onUnmounted(() => {
   position: relative;
   overflow: hidden;
 }
+.banner-calendar {
+  position: absolute;
+  right: -100%;
+  bottom: 0;
+  width: clamp(300px, 25%, 450px);
+  height: 250px;
+  background: var(--green);
+  z-index: 99;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly;
+  box-shadow: 0 0 50px #000;
+  transition: right 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
 
+.banner-calendar.visible {
+  right: 0;
+}
+.banner-calendar p {
+  color: #fff;
+  font-weight: 500;
+}
+
+.score {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 4%;
+}
+.score span {
+  font-family: var(--font-netflix);
+  font-size: clamp(120px, 10vw, 160px);
+  color: var(--green);
+  background: #fff;
+  line-height: 1;
+  padding: 0 4%;
+}
+
+.calendar-day {
+  display: flex;
+  /* justify-content: end;
+  transform: translateY(-26px);
+  line-height: 0; */
+}
 .background-layer {
   position: absolute;
   top: 0;
@@ -194,7 +325,7 @@ onUnmounted(() => {
   height: 100%;
   background-attachment: fixed;
   background-position: center;
-  background-size: cover;
+  background-size: 100%;
   background-repeat: no-repeat;
   opacity: 0;
   transition: opacity 2s ease-in-out;
@@ -375,6 +506,7 @@ onUnmounted(() => {
 }
 .map-title p {
   text-align: end;
+  color: #fff;
 }
 
 .map-title p span {

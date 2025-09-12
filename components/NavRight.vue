@@ -27,9 +27,33 @@
 </template>
 
 <script setup>
+import { watch, onMounted, onUnmounted } from "vue";
 import { useMenu } from "~/composables/useMenu";
+import { useSelectedProject } from "~/composables/useSelectedProject";
 
 const { isOpen, menuRef: navRightRef, updatePosition } = useMenu("right");
+const { clearSelectedProject } = useSelectedProject();
+
+// Очищаем выбранный проект при закрытии меню
+watch(isOpen, (newValue) => {
+  if (!newValue) {
+    clearSelectedProject();
+  }
+});
+
+// Слушаем события для открытия/закрытия меню
+const handleToggleRightMenu = (event) => {
+  console.log("NavRight получил событие:", event.detail);
+  isOpen.value = event.detail.isOpen;
+};
+
+onMounted(() => {
+  window.addEventListener("toggleRightMenu", handleToggleRightMenu);
+});
+
+onUnmounted(() => {
+  window.removeEventListener("toggleRightMenu", handleToggleRightMenu);
+});
 </script>
 
 <style scoped>

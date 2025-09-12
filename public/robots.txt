@@ -1,2 +1,16 @@
 User-Agent: *
-Disallow:
+Disallow: /
+
+# Запрет для всех ботов
+User-Agent: *
+Crawl-Delay: 86400
+
+# Разрешение только для основных поисковых систем (опционально)
+# User-Agent: Googlebot
+# Disallow:
+
+# User-Agent: Bingbot
+# Disallow:
+
+# User-Agent: YandexBot
+# Disallow:

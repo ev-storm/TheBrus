@@ -7,7 +7,6 @@ export const useMenu = (menuType = "left") => {
   const eventName = menuType === "left" ? "toggleMenu" : "toggleRightMenu";
 
   const openMenu = () => {
-    console.log(`Opening ${menuType} menu`);
     isOpen.value = true;
     window.dispatchEvent(
       new CustomEvent(eventName, {
@@ -17,7 +16,6 @@ export const useMenu = (menuType = "left") => {
   };
 
   const closeMenu = () => {
-    console.log(`Closing ${menuType} menu`);
     isOpen.value = false;
     window.dispatchEvent(
       new CustomEvent(eventName, {
@@ -35,26 +33,33 @@ export const useMenu = (menuType = "left") => {
   };
 
   const handleToggleMenu = (event) => {
-    console.log(`${menuType} menu received event:`, event.detail);
     isOpen.value = event.detail.isOpen;
   };
 
   const handleClickOutside = (event) => {
+    // Если меню закрыто, не обрабатываем клики
+    if (!isOpen.value) {
+      return;
+    }
+
     // Не закрываем меню, если клик по кнопке trigger или её дочерним элементам
     if (
       event.target.classList.contains("trigger") ||
       event.target.closest(".trigger")
     ) {
-      console.log("Click on trigger, ignoring");
       return;
     }
 
+    // Не закрываем меню, если клик по кнопке "Заказать" или её дочерним элементам
     if (
-      isOpen.value &&
-      menuRef.value &&
-      !menuRef.value.contains(event.target)
+      event.target.classList.contains("order-btn") ||
+      event.target.closest(".order-btn")
     ) {
-      console.log(`Click outside detected, closing ${menuType} menu`);
+      return;
+    }
+
+    // Закрываем меню только если клик вне его области
+    if (menuRef.value && !menuRef.value.contains(event.target)) {
       closeMenu();
     }
   };
@@ -81,10 +86,10 @@ export const useMenu = (menuType = "left") => {
     window.addEventListener("resize", updatePosition);
     window.addEventListener("scroll", updatePosition);
     window.addEventListener(eventName, handleToggleMenu);
-    // Добавляем обработчик click outside с небольшой задержкой
+    // Добавляем обработчик click outside с задержкой, чтобы избежать конфликтов
     setTimeout(() => {
-      document.addEventListener("click", handleClickOutside);
-    }, 100);
+      document.addEventListener("click", handleClickOutside, { passive: true });
+    }, 200);
   });
 
   onUnmounted(() => {

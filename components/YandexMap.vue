@@ -61,8 +61,8 @@ onMounted(() => {
 
   // Проверяем, есть ли ошибка загрузки скрипта
   setTimeout(() => {
-    if (!window.ymaps) {
-      console.error("YMaps v2 failed to load - likely invalid API key");
+    if (!window.ymaps3) {
+      console.error("YMaps v3 failed to load - likely invalid API key");
       showApiKeyError();
     } else {
       initMap();
@@ -74,6 +74,8 @@ const initMapWithYMaps3 = (ymaps3) => {
   try {
     console.log("Initializing map with YMaps v3");
     console.log("Available ymaps3 methods:", Object.keys(ymaps3));
+    console.log("YMapZoomControl available:", !!ymaps3.YMapZoomControl);
+    console.log("YMapControls available:", !!ymaps3.YMapControls);
 
     // Проверяем, что нужные классы доступны
     if (!ymaps3.YMap) {
@@ -85,56 +87,107 @@ const initMapWithYMaps3 = (ymaps3) => {
       YMapDefaultSchemeLayer,
       YMapDefaultFeaturesLayer,
       YMapControls,
-      YMapZoomControl,
       YMapMarker,
     } = ymaps3;
 
-    // Создаем карту с примерными координатами
+    // Создаем карту с координатами Варсонофьевского переулка
     map = new YMap(mapContainer.value, {
       location: {
-        center: [55.761, 37.621], // Примерные координаты Москвы
-        zoom: 15,
+        center: [37.613575, 55.765635], // Варсонофьевский переулок, 10с2, Москва [долгота, широта]
+        zoom: 17,
       },
       behaviors: ["drag", "scrollZoom"],
     });
 
-    // Добавляем слои
-    const scheme = new YMapDefaultSchemeLayer();
+    // Добавляем слои с темной темой и кастомизацией
+    const scheme = new YMapDefaultSchemeLayer({
+      theme: "dark",
+      customization: [
+        {
+          tags: {
+            any: ["food_and_drink", "shopping", "commercial_services"],
+          },
+          stylers: {
+            visibility: "off",
+          },
+        },
+        {
+          tags: {
+            any: ["traffic_light"],
+          },
+          stylers: {
+            visibility: "off",
+          },
+        },
+        {
+          tags: {
+            any: ["entrance"],
+          },
+          stylers: {
+            visibility: "off",
+          },
+        },
+        {
+          tags: {
+            any: ["road"],
+            none: [
+              "road_1",
+              "road_2",
+              "road_3",
+              "road_4",
+              "road_5",
+              "road_6",
+              "road_7",
+            ],
+          },
+          elements: "label.icon",
+          stylers: {
+            visibility: "off",
+          },
+        },
+        {
+          tags: {
+            any: ["transit"],
+          },
+          stylers: {
+            visibility: "off",
+          },
+        },
+      ],
+    });
     const features = new YMapDefaultFeaturesLayer();
     map.addChild(scheme);
     map.addChild(features);
 
     // Добавляем контролы масштабирования
     const controlsContainer = new YMapControls({ position: "right" });
-    const zoomControl = new YMapZoomControl({});
-    controlsContainer.addChild(zoomControl);
     map.addChild(controlsContainer);
     controls = [controlsContainer];
 
     // Координаты для маркера
-    const coords = [55.761, 37.621]; // Примерные координаты
+    const coords = [37.613575, 55.765635]; // Варсонофьевский переулок, 10с2, Москва [долгота, широта]
 
-    // Создаем маркер
+    // Создаем маркер с кастомной SVG иконкой
     const markerEl = document.createElement("div");
-    markerEl.style.width = "32px";
-    markerEl.style.height = "32px";
-    markerEl.style.borderRadius = "50%";
-    markerEl.style.background = "#e53935";
-    markerEl.style.boxShadow = "0 0 0 3px white, 0 2px 4px rgba(0,0,0,0.3)";
-    markerEl.style.border = "2px solid #fff";
+    markerEl.style.width = "40px";
+    markerEl.style.height = "40px";
     markerEl.style.cursor = "pointer";
-
-    // Добавляем иконку маркера
-    markerEl.innerHTML = "📍";
-    markerEl.style.fontSize = "16px";
     markerEl.style.display = "flex";
     markerEl.style.alignItems = "center";
     markerEl.style.justifyContent = "center";
+    markerEl.style.transform = "translateY(-100%) translateX(-50%)";
+
+    // Добавляем SVG иконку маркера
+    markerEl.innerHTML = `
+      <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <image href="/svg/button/map-cursor.svg" width="40" height="40"/>
+      </svg>
+    `;
 
     const marker = new YMapMarker({ coordinates: coords }, markerEl);
 
     map.addChild(marker);
-    map.setLocation({ center: coords, zoom: 15 });
+    map.setLocation({ center: coords, zoom: 17 });
 
     console.log("Map initialized successfully with YMaps v3");
   } catch (error) {

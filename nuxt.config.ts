@@ -13,6 +13,28 @@ export default defineNuxtConfig({
   },
   app: {
     head: {
+      meta: [
+        {
+          name: "robots",
+          content: "noindex, nofollow, noarchive, nosnippet, noimageindex",
+        },
+        {
+          name: "googlebot",
+          content: "noindex, nofollow, noarchive, nosnippet, noimageindex",
+        },
+        {
+          name: "bingbot",
+          content: "noindex, nofollow, noarchive, nosnippet, noimageindex",
+        },
+        {
+          name: "yandexbot",
+          content: "noindex, nofollow, noarchive, nosnippet, noimageindex",
+        },
+        {
+          "http-equiv": "X-Robots-Tag",
+          content: "noindex, nofollow, noarchive, nosnippet, noimageindex",
+        },
+      ],
       script: [
         {
           src: "https://api-maps.yandex.ru/v3/?apikey=2daa9fb2-779c-4369-b15e-8ba3c97897c5&lang=ru_RU",

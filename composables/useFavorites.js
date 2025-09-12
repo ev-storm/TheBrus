@@ -9,9 +9,16 @@ export const useFavorites = () => {
     secure: true,
   });
 
+  // Инициализация: убеждаемся, что cookie содержит корректный массив
+  if (!Array.isArray(favoritesCookie.value)) {
+    favoritesCookie.value = [];
+  }
+
   // Функция для добавления/удаления из избранного
   const toggleFavorite = (itemId) => {
-    const currentFavorites = [...favoritesCookie.value];
+    const currentFavorites = Array.isArray(favoritesCookie.value)
+      ? [...favoritesCookie.value]
+      : [];
     const index = currentFavorites.indexOf(itemId);
 
     if (index > -1) {
@@ -28,12 +35,19 @@ export const useFavorites = () => {
 
   // Функция для проверки, находится ли элемент в избранном
   const isFavorite = (itemId) => {
-    return favoritesCookie.value.includes(itemId);
+    const favorites = Array.isArray(favoritesCookie.value)
+      ? favoritesCookie.value
+      : [];
+    return favorites.includes(itemId);
   };
 
   // Функция для получения количества избранных
   const getFavoritesCount = () => {
-    return favoritesCookie.value.length;
+    // Убеждаемся, что favoritesCookie.value является массивом
+    const favorites = Array.isArray(favoritesCookie.value)
+      ? favoritesCookie.value
+      : [];
+    return favorites.length;
   };
 
   // Функция для очистки избранного

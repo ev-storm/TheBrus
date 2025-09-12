@@ -1,7 +1,7 @@
 <template>
   <nav class="nav" :class="{ scrolled: isScrolled }">
     <div class="nav-container">
-      <div class="nav-logo">
+      <div class="nav-logo" @click="goToHome">
         <img src="/svg/logo/logo-nav.svg" alt="TheBrus" class="logo" />
       </div>
       <div class="nav-button">
@@ -30,6 +30,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from "vue";
 import { useMenu } from "~/composables/useMenu";
+import { useRouter } from "vue-router";
 
 const isScrolled = ref(false);
 let lastScrollY = 0;
@@ -41,6 +42,11 @@ const isMenuOpen = ref(false);
 
 const { toggleMenu: toggleLeftMenu } = useMenu("left");
 const { openMenu: openRightMenu } = useMenu("right");
+const router = useRouter();
+
+const goToHome = () => {
+  router.push("/");
+};
 
 const toggleMenu = () => {
   isMenuOpen.value = !isMenuOpen.value;
@@ -152,6 +158,7 @@ onUnmounted(() => {
 .nav-logo {
   display: flex;
   align-items: center;
+  cursor: pointer;
 }
 
 .logo {

@@ -117,6 +117,10 @@ const { isOpen, menuRef: navLeftRef, updatePosition } = useMenu("left");
 .nav-left-menu ul li {
   line-height: 1;
 }
+.nav-left-menu ul li a {
+  line-height: 1.7;
+  font-size: clamp(10px, 1vw, 13px) !important;
+}
 
 .main-link {
   font-size: clamp(14px, 1vw, 18px);
@@ -139,7 +143,7 @@ const { isOpen, menuRef: navLeftRef, updatePosition } = useMenu("left");
 .nav-left-menu a,
 .nav-left-menu a:visited {
   color: var(--font);
-  font-size: var(--fs-p);
+
   font-weight: 500;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }

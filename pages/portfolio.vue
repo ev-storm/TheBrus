@@ -206,7 +206,7 @@ function sortByArea() {
           </div>
         </div>
       </div>
-      <div class="catalog-con" v-if="items">
+      <div class="catalog-con" v-if="items && items.length > 0">
         <ProductCard
           v-for="item in items"
           :key="getCardId(item, activeTab)"
@@ -216,11 +216,27 @@ function sortByArea() {
           :img1="item.img1"
           :img2="item.img2"
           :img3="item.img3"
+          :img4="item.img4"
+          :img5="item.img5"
           :description="item.description"
           :pdf="item.pdf"
           :hideActions="activeTab === 'portfolio'"
           :cardId="getCardId(item, activeTab)"
         />
+      </div>
+
+      <!-- Сообщение для пустого состояния избранного -->
+      <div
+        v-if="showFavorites && items && items.length === 0"
+        class="empty-favorites"
+      >
+        <div class="empty-favorites-content">
+          <h3>Вы пока не добавили в избранное</h3>
+          <p>
+            Добавьте понравившиеся проекты в избранное, чтобы они отображались
+            здесь
+          </p>
+        </div>
       </div>
     </div>
   </div>
@@ -269,6 +285,7 @@ function sortByArea() {
 .b1-text div p {
   text-align: end;
   font-weight: 500;
+  color: #fff;
   margin: 10% 0;
   font-size: clamp(16px, 2vw, 22px);
 }
@@ -276,8 +293,8 @@ function sortByArea() {
   font-size: clamp(10px, 1vw, 14px);
 }
 .b2 {
-  height: 200vh;
   width: 100%;
+  padding-bottom: 20vh;
 }
 .catalog-btn-con {
   width: 100%;
@@ -346,5 +363,33 @@ function sortByArea() {
   .catalog-con {
     grid-template-columns: 1fr;
   }
+}
+
+/* Стили для пустого состояния избранного */
+.empty-favorites {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+  padding: 40px 20px;
+}
+
+.empty-favorites-content {
+  text-align: center;
+  max-width: 400px;
+}
+
+.empty-favorites-content h3 {
+  font-size: 24px;
+  font-weight: 500;
+  color: #ffffff;
+  margin-bottom: 16px;
+}
+
+.empty-favorites-content p {
+  font-size: 16px;
+  color: #9f9f9f;
+  line-height: 1.5;
+  margin: 0;
 }
 </style>
