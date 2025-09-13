@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref } from "vue";
+import { computed, ref, onMounted, onUnmounted } from "vue";
 import FavoritesButton from "./FavoritesButton.vue";
 import { useRouter } from "vue-router";
 import { useSelectedProject } from "~/composables/useSelectedProject";
@@ -16,10 +16,14 @@ const props = defineProps({
   img3: { type: String, required: false },
   img4: { type: String, required: false },
   img5: { type: String, required: false },
+  sh: { type: String, required: false },
+  sh2: { type: String, required: false },
+  sh3: { type: String, required: false },
   description: { type: String, required: false },
   pdf: { type: String, required: false },
   liked: { type: Boolean, default: false },
   hideActions: { type: Boolean, default: false },
+  showPlan: { type: Boolean, default: false },
   cardId: { type: [String, Number], required: true },
 });
 
@@ -55,6 +59,19 @@ const currentImage = computed(() => images.value[hoveredIndex.value] || "");
 // Состояние модального окна
 const isModalOpen = ref(false);
 const modalImageIndex = ref(0);
+
+// Состояние модального окна для планов
+const isPlanModalOpen = ref(false);
+const planModalIndex = ref(0);
+
+// Планы для модального окна
+const planImages = computed(() => {
+  const plans = [];
+  if (props.sh) plans.push(props.sh);
+  if (props.sh2) plans.push(props.sh2);
+  if (props.sh3) plans.push(props.sh3);
+  return plans;
+});
 
 // Фильтруем изображения для модального окна (только существующие)
 const modalImages = computed(() => {
@@ -102,6 +119,90 @@ function handleModalClick() {
   closeModal();
 }
 
+// Функции для модального окна планов
+function openPlanModal() {
+  if (planImages.value.length > 0) {
+    isPlanModalOpen.value = true;
+    planModalIndex.value = 0;
+    // Блокируем скролл страницы
+    document.body.style.overflow = "hidden";
+  }
+}
+
+function closePlanModal() {
+  isPlanModalOpen.value = false;
+  // Восстанавливаем скролл страницы
+  document.body.style.overflow = "auto";
+}
+
+function handlePlanModalClick() {
+  closePlanModal();
+}
+
+// Функции навигации для планов
+function nextPlanImage() {
+  if (planImages.value.length > 1) {
+    planModalIndex.value = (planModalIndex.value + 1) % planImages.value.length;
+  }
+}
+
+function prevPlanImage() {
+  if (planImages.value.length > 1) {
+    planModalIndex.value =
+      planModalIndex.value === 0
+        ? planImages.value.length - 1
+        : planModalIndex.value - 1;
+  }
+}
+
+// Обработка клавиатуры для модальных окон
+function handleKeydown(event) {
+  // Обработка модального окна изображений
+  if (isModalOpen.value) {
+    switch (event.key) {
+      case "ArrowLeft":
+        event.preventDefault();
+        prevModalImage();
+        break;
+      case "ArrowRight":
+        event.preventDefault();
+        nextModalImage();
+        break;
+      case "Escape":
+        event.preventDefault();
+        closeModal();
+        break;
+    }
+  }
+
+  // Обработка модального окна планов
+  if (isPlanModalOpen.value) {
+    switch (event.key) {
+      case "ArrowLeft":
+        event.preventDefault();
+        prevPlanImage();
+        break;
+      case "ArrowRight":
+        event.preventDefault();
+        nextPlanImage();
+        break;
+      case "Escape":
+        event.preventDefault();
+        closePlanModal();
+        break;
+    }
+  }
+}
+
+// Добавляем и удаляем слушатель клавиатуры
+onMounted(() => {
+  document.addEventListener("keydown", handleKeydown);
+});
+
+onUnmounted(() => {
+  document.removeEventListener("keydown", handleKeydown);
+});
+
 function goToHouseDetails() {
   // Передаем данные о доме через query параметры
   router.push({
@@ -144,7 +245,7 @@ function handleOrder() {
         <div class="hover-zone right" @mouseenter="handleEnter(2)"></div>
       </div>
       <div class="badge">
-        <img src="/public/svg/logo/logo.svg" alt="logo" />
+        <img src="/svg/logo/logo.svg" alt="logo" />
       </div>
       <div class="dots">
         <span :class="{ active: hoveredIndex === 0 }"></span>
@@ -174,7 +275,11 @@ function handleOrder() {
             Заказать
           </button>
           <div>
-            <div class="plan" v-if="!hideActions">
+            <div
+              class="plan"
+              @click="openPlanModal"
+              v-if="showPlan || (!hideActions && planImages.length > 0)"
+            >
               <svg
                 width="19"
                 height="18"
@@ -301,20 +406,111 @@ function handleOrder() {
       </div>
     </div>
   </Teleport>
+
+  <!-- Модальное окно для просмотра планов -->
+  <Teleport to="body">
+    <div
+      v-if="isPlanModalOpen"
+      class="modal-overlay"
+      @click="handlePlanModalClick"
+    >
+      <div class="modal-container" @click.stop>
+        <!-- Левая кликабельная область -->
+        <div
+          class="modal-nav-left"
+          @click.stop="prevPlanImage"
+          v-if="planImages.length > 1"
+        ></div>
+
+        <!-- Правая кликабельная область -->
+        <div
+          class="modal-nav-right"
+          @click.stop="nextPlanImage"
+          v-if="planImages.length > 1"
+        ></div>
+
+        <!-- Изображение плана -->
+        <img
+          v-if="planImages[planModalIndex]"
+          :src="planImages[planModalIndex]"
+          :alt="title + ' - План'"
+          class="modal-image"
+        />
+
+        <!-- Стрелки навигации -->
+        <div class="modal-arrows" v-if="planImages.length > 1">
+          <div class="modal-arrow-left" @click.stop="prevPlanImage">
+            <svg
+              width="80"
+              height="80"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M15 18L9 12L15 6"
+                stroke="white"
+                stroke-width="1"
+                stroke-linecap="square"
+                stroke-linejoin="miter"
+              />
+            </svg>
+          </div>
+          <div class="modal-arrow-right" @click.stop="nextPlanImage">
+            <svg
+              width="80"
+              height="80"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M9 18L15 12L9 6"
+                stroke="white"
+                stroke-width="1"
+                stroke-linecap="square"
+                stroke-linejoin="miter"
+              />
+            </svg>
+          </div>
+        </div>
+
+        <!-- Индикаторы планов -->
+        <div class="modal-indicators" v-if="planImages.length > 1">
+          <div
+            v-for="(plan, index) in planImages"
+            :key="index"
+            class="modal-indicator"
+            :class="{ active: index === planModalIndex }"
+            @click.stop="planModalIndex = index"
+          ></div>
+        </div>
+      </div>
+    </div>
+  </Teleport>
 </template>
 
 <style scoped>
 .card {
   overflow: hidden;
+  width: 100%;
+}
+.title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .image {
   width: 100%;
-  aspect-ratio: 16/9;
+  aspect-ratio: 16 / 9;
   background-size: cover;
   background-position: center;
   position: relative;
   cursor: pointer;
   background: #ffffff0d;
+  background-position: center;
+  background-position: center;
+  background-size: cover;
 }
 .hover-zones {
   position: absolute;
@@ -386,7 +582,7 @@ function handleOrder() {
 .meta {
   display: flex;
   flex-direction: column;
-  width: 50%;
+  width: 55%;
 }
 .meta div {
   display: flex;
@@ -502,7 +698,7 @@ function handleOrder() {
   width: auto;
   height: 100%;
   object-fit: contain;
-  border-radius: 0px;
+  border-radius: 0;
   cursor: default;
 }
 
@@ -557,5 +753,138 @@ function handleOrder() {
 
 .modal-nav-right:hover ~ .modal-arrows .modal-arrow-right {
   opacity: 1;
+}
+/* Мобильная адаптация */
+@media (max-width: 768px) {
+  .card {
+    margin-bottom: 20px;
+  }
+
+  .image {
+    aspect-ratio: 4 / 3;
+  }
+
+  .hover-zones {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+
+  .badge {
+    left: 15px;
+    bottom: 15px;
+    font-size: 14px;
+  }
+
+  .badge img {
+    height: 20px;
+  }
+
+  .dots {
+    right: 15px;
+    bottom: 15px;
+    gap: 6px;
+  }
+
+  .dots span {
+    width: 6px;
+    height: 6px;
+  }
+
+  .content {
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+  }
+
+  .meta {
+    width: 100%;
+  }
+
+  .meta div {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .title {
+    font-size: 18px;
+    white-space: normal;
+    line-height: 1.3;
+    margin-bottom: 10px;
+  }
+
+  .area {
+    font-size: 16px;
+    color: #9f9f9f;
+  }
+
+  .price {
+    font-size: 20px;
+    font-weight: 600;
+  }
+
+  .actions {
+    width: 100%;
+    align-items: stretch;
+  }
+
+  .actions .btn {
+    font-size: 16px;
+    padding: 12px 20px;
+    width: 100%;
+    min-height: 48px;
+    touch-action: manipulation;
+  }
+
+  .icons {
+    width: 100%;
+    justify-content: space-between;
+    padding: 15px 0;
+  }
+
+  .icons div {
+    gap: 15px;
+  }
+
+  .icons img {
+    height: 24px;
+  }
+
+  /* Модальные окна для мобильных */
+  .modal-container {
+    width: 95vw;
+    height: 70vh;
+    max-width: none;
+  }
+
+  .modal-image {
+    width: 100%;
+    height: auto;
+    max-height: 100%;
+  }
+
+  .modal-arrows {
+    padding: 0 10px;
+  }
+
+  .modal-arrow-left,
+  .modal-arrow-right {
+    width: 50px;
+    height: 50px;
+  }
+
+  .modal-arrow-left svg,
+  .modal-arrow-right svg {
+    width: 40px;
+    height: 40px;
+  }
+
+  .modal-indicators {
+    bottom: 20px;
+  }
+
+  .modal-indicator {
+    width: 8px;
+    height: 8px;
+  }
 }
 </style>

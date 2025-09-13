@@ -1,7 +1,7 @@
 <template>
   <div class="main-container">
     <div class="b1">
-      <img src="/public/img/work.svg" alt="" />
+      <img src="/img/work.svg" alt="" />
     </div>
   </div>
 </template>
@@ -9,20 +9,29 @@
 <script setup>
 // Страница конструктора
 useHead({
-  title: "Конструктор - TheBrus",
+  title: "Конструктор каркасных домов - Создать проект дома | TheBrus",
   meta: [
     {
       name: "description",
       content:
-        "Конструктор проектов TheBrus - создавайте свои проекты с помощью нашего инструмента",
+        "Конструктор каркасных домов - создайте свой проект дома под ключ. Планировщик каркасных домов, расчет стоимости строительства каркасного дома.",
     },
     {
       name: "keywords",
-      content: "конструктор, создание проектов, инструмент, веб-разработка",
+      content:
+        "конструктор каркасных домов, планировщик дома, создать проект каркасного дома, расчет стоимости каркасного дома, планировщик каркасного дома, проектирование каркасных домов, конструктор домов под ключ",
     },
-    { property: "og:title", content: "Конструктор - TheBrus" },
-    { property: "og:description", content: "Конструктор проектов TheBrus" },
+    {
+      property: "og:title",
+      content: "Конструктор каркасных домов - Создать проект дома | TheBrus",
+    },
+    {
+      property: "og:description",
+      content:
+        "Конструктор каркасных домов - создайте свой проект дома под ключ",
+    },
     { property: "og:type", content: "website" },
+    { property: "og:locale", content: "ru_RU" },
   ],
 });
 </script>

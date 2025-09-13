@@ -124,6 +124,7 @@ input::placeholder,
 textarea::placeholder,
 .form-project textarea::placeholder {
   color: rgba(255, 255, 255, 0.6);
+  font-weight: 300;
   /* font-weight: 300; */
   /* font-size: clamp(12px, 0.7vw, 15px); */
 }
@@ -174,4 +175,11 @@ p {
 span {
   font-family: var(--font-primary);
   font-weight: 400;
+}
+@media (max-width: 768px) {
+  .btn {
+    padding: 5px 30px !important;
+    font-size: 18px;
+    width: 100%;
+  }
 }

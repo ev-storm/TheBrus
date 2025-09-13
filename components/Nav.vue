@@ -1,4 +1,15 @@
 <template>
+  <button
+    class="call"
+    @click="
+      (event) => {
+        event.stopPropagation();
+        openRightMenuManager();
+      }
+    "
+  >
+    <img src="/public/svg/button/phone.svg" alt="" />
+  </button>
   <nav class="nav" :class="{ scrolled: isScrolled }">
     <div class="nav-container">
       <div class="nav-logo" @click="goToHome">
@@ -7,16 +18,16 @@
       <div class="nav-button">
         <img
           class="nav-menu-button"
-          src="/public/svg/button/nav/1.svg"
+          src="/svg/button/nav/1.svg"
           alt=""
           @click.stop="toggleMenu"
         />
         <button
-          class="btn trigger"
+          class="btn trigger trigger-pc"
           @click="
             (event) => {
               event.stopPropagation();
-              openRightMenu();
+              openRightMenuManager();
             }
           "
         >
@@ -30,6 +41,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from "vue";
 import { useMenu } from "~/composables/useMenu";
+import { useMenuManager } from "~/composables/useMenuManager";
 import { useRouter } from "vue-router";
 
 const isScrolled = ref(false);
@@ -42,6 +54,7 @@ const isMenuOpen = ref(false);
 
 const { toggleMenu: toggleLeftMenu } = useMenu("left");
 const { openMenu: openRightMenu } = useMenu("right");
+const { openLeftMenu, openRightMenu: openRightMenuManager } = useMenuManager();
 const router = useRouter();
 
 const goToHome = () => {
@@ -50,12 +63,16 @@ const goToHome = () => {
 
 const toggleMenu = () => {
   isMenuOpen.value = !isMenuOpen.value;
-  // Передаем событие в NavLeft через глобальное событие
-  window.dispatchEvent(
-    new CustomEvent("toggleMenu", {
-      detail: { isOpen: isMenuOpen.value },
-    })
-  );
+  if (isMenuOpen.value) {
+    openLeftMenu();
+  } else {
+    // Передаем событие в NavLeft через глобальное событие
+    window.dispatchEvent(
+      new CustomEvent("toggleMenu", {
+        detail: { isOpen: false },
+      })
+    );
+  }
 };
 
 const handleScroll = () => {
@@ -175,5 +192,39 @@ onUnmounted(() => {
 .nav-button {
   display: flex;
   align-items: center;
+}
+.call {
+  display: none;
+}
+@media (max-width: 768px) {
+  .trigger-pc {
+    display: none;
+  }
+  .call {
+    display: flex;
+    position: fixed;
+    right: 5%;
+    bottom: 10%;
+    border: none;
+    background: var(--green);
+    z-index: 9999;
+    padding: 5%;
+    border-radius: 100px;
+    line-height: 0;
+    transition: var(--tran);
+    box-shadow: 0 0 20px #00000069;
+  }
+  .call:active {
+    scale: 0.9;
+  }
+  .call img {
+    width: 10vw;
+  }
+  .nav-button img {
+    margin: 0;
+  }
+  .logo {
+    height: 30px;
+  }
 }
 </style>

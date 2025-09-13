@@ -1,20 +1,32 @@
 <script setup>
-import { ref, computed, watch } from "vue";
+import { ref, computed, watch, onMounted } from "vue";
 import FavoritesCounter from "~/components/FavoritesCounter.vue";
 
 // Страница портфолио
 useHead({
-  title: "Портфолио - TheBrus",
+  title: "Портфолио - Строительство каркасных домов под ключ | TheBrus",
   meta: [
     {
       name: "description",
       content:
-        "Портфолио работ проекта TheBrus - примеры наших проектов и достижений",
+        "Портфолио строительства каркасных домов под ключ. Примеры наших работ в Москве и Московской области. Каркасно-щитовые дома, дома из клееного бруса.",
     },
-    { name: "keywords", content: "портфолио, проекты, работы, веб-разработка" },
-    { property: "og:title", content: "Портфолио - TheBrus" },
-    { property: "og:description", content: "Портфолио работ проекта TheBrus" },
+    {
+      name: "keywords",
+      content:
+        "портфолио каркасных домов, примеры строительства каркасных домов, готовые каркасные дома, проекты каркасных домов, строительство каркасных домов под ключ, каркасные дома московская область, каркасно щитовые дома портфолио, дома из клееного бруса портфолио, заказать каркасный дом, стоимость каркасного дома под ключ",
+    },
+    {
+      property: "og:title",
+      content: "Портфолио - Строительство каркасных домов под ключ | TheBrus",
+    },
+    {
+      property: "og:description",
+      content:
+        "Портфолио строительства каркасных домов под ключ. Примеры наших работ в Москве и Московской области.",
+    },
     { property: "og:type", content: "website" },
+    { property: "og:locale", content: "ru_RU" },
   ],
 });
 // Импортируем данные напрямую как модули
@@ -32,6 +44,32 @@ console.log("Portfolio loaded:", portfolio.value?.length || 0);
 const activeTab = useState("portfolio-activeTab", () => "order");
 const sortBy = useState("portfolio-sortBy", () => null);
 const showFavorites = useState("portfolio-showFavorites", () => false);
+
+// Получаем route для обработки query параметров
+const route = useRoute();
+
+// Обработка query параметров для активации кнопок
+onMounted(() => {
+  if (route.query.tab) {
+    if (route.query.tab === "portfolio") {
+      activeTab.value = "portfolio";
+    } else if (route.query.tab === "order") {
+      activeTab.value = "order";
+    }
+  }
+});
+
+// Отслеживаем изменения route для обновления activeTab
+watch(
+  () => route.query.tab,
+  (newTab) => {
+    if (newTab === "portfolio") {
+      activeTab.value = "portfolio";
+    } else if (newTab === "order") {
+      activeTab.value = "order";
+    }
+  }
+);
 
 // Функциональность избранного
 const { isFavorite } = useFavorites();
@@ -218,9 +256,13 @@ function sortByArea() {
           :img3="item.img3"
           :img4="item.img4"
           :img5="item.img5"
+          :sh="item.sh"
+          :sh2="item.sh2"
+          :sh3="item.sh3"
           :description="item.description"
           :pdf="item.pdf"
           :hideActions="activeTab === 'portfolio'"
+          :showPlan="activeTab === 'portfolio'"
           :cardId="getCardId(item, activeTab)"
         />
       </div>
@@ -248,7 +290,7 @@ function sortByArea() {
   height: 65vh;
   display: flex;
   align-items: end;
-  background-image: url("/public/img/catalog/1.png");
+  background-image: url("/img/catalog/1.png");
   background-size: 1700px;
   background-position: top;
   background-attachment: fixed;
@@ -391,5 +433,114 @@ function sortByArea() {
   color: #9f9f9f;
   line-height: 1.5;
   margin: 0;
+}
+
+/* Мобильная адаптация */
+@media (max-width: 768px) {
+  .b1 {
+    height: 50vh;
+    background-attachment: scroll;
+    background-size: cover;
+    background-position: center;
+  }
+
+  .b1-text {
+    height: 100%;
+    flex-direction: column;
+    justify-content: end;
+    align-items: center;
+    text-align: center;
+    padding: 20px;
+  }
+
+  .b1-text h1 {
+    font-size: 50px;
+    margin-bottom: 20px;
+  }
+
+  .b1-text div {
+    display: none;
+  }
+
+  .b1-text div p {
+    text-align: center;
+    font-size: 16px;
+    margin: 15px 0;
+  }
+
+  .b1-text div button {
+    font-size: 14px;
+    padding: 12px 24px;
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .b2 {
+    padding: 20px;
+    padding-bottom: 10vh;
+  }
+
+  .catalog-btn-con {
+    flex-direction: column;
+    height: auto;
+    gap: 20px;
+    align-items: stretch;
+  }
+
+  .catalog-btn {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .catalog-btn .btn {
+    width: 100%;
+    padding: 15px 20px;
+    font-size: 16px;
+    min-height: 48px;
+    touch-action: manipulation;
+  }
+
+  .catalog-filter {
+    flex-direction: row;
+    gap: 15px;
+    align-items: center;
+  }
+
+  .filter-item {
+    font-size: 16px;
+    padding: 10px 15px;
+    min-height: 44px;
+    justify-content: center;
+
+    border-radius: 0;
+
+    width: 100%;
+    max-width: 200px;
+  }
+
+  .filter-marg {
+    display: none;
+  }
+
+  .catalog-con {
+    grid-template-columns: 1fr;
+    gap: 30px;
+    margin-top: 30px;
+  }
+
+  .empty-favorites {
+    min-height: 200px;
+    padding: 20px;
+  }
+
+  .empty-favorites-content h3 {
+    font-size: 20px;
+  }
+
+  .empty-favorites-content p {
+    font-size: 14px;
+  }
 }
 </style>

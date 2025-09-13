@@ -68,7 +68,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from "vue";
+import { ref, watch, onMounted, onUnmounted } from "vue";
 
 const props = defineProps({
   isOpen: {
@@ -137,6 +137,35 @@ function prevImage() {
         : currentIndex.value - 1;
   }
 }
+
+// Обработка клавиатуры
+function handleKeydown(event) {
+  if (!props.isOpen) return;
+
+  switch (event.key) {
+    case "ArrowLeft":
+      event.preventDefault();
+      prevImage();
+      break;
+    case "ArrowRight":
+      event.preventDefault();
+      nextImage();
+      break;
+    case "Escape":
+      event.preventDefault();
+      closeModal();
+      break;
+  }
+}
+
+// Добавляем и удаляем слушатель клавиатуры
+onMounted(() => {
+  document.addEventListener("keydown", handleKeydown);
+});
+
+onUnmounted(() => {
+  document.removeEventListener("keydown", handleKeydown);
+});
 </script>
 
 <style scoped>

@@ -1,5 +1,13 @@
 <template>
-  <div ref="navLeftRef" class="nav-left" :class="{ open: isOpen }" @click.stop>
+  <div
+    ref="navLeftRef"
+    class="nav-left"
+    :class="{ open: isOpen }"
+    @click.stop
+    @touchstart="handleTouchStart"
+    @touchmove="handleTouchMove"
+    @touchend="handleTouchEnd"
+  >
     <div class="nav-left-container">
       <div class="nav-left-content">
         <div class="nav-top-menu"></div>
@@ -8,12 +16,12 @@
             <ul>
               <NuxtLink class="main-link" to="/portfolio">Каталог</NuxtLink>
               <li>
-                <NuxtLink class="sub-link" to="/portfolio"
+                <NuxtLink class="sub-link" to="/portfolio?tab=order"
                   >Заказать готовое решение</NuxtLink
                 >
               </li>
               <li>
-                <NuxtLink class="sub-link" to="/portfolio"
+                <NuxtLink class="sub-link" to="/portfolio?tab=portfolio"
                   >Выполненые проекты</NuxtLink
                 >
               </li>
@@ -66,9 +74,64 @@
 </template>
 
 <script setup>
+import { watch, ref } from "vue";
 import { useMenu } from "~/composables/useMenu";
+import { useMenuManager } from "~/composables/useMenuManager";
 
 const { isOpen, menuRef: navLeftRef, updatePosition } = useMenu("left");
+const { leftMenuOpen } = useMenuManager();
+
+// Переменные для обработки свайпа
+const touchStartX = ref(0);
+const touchStartY = ref(0);
+const isSwipeStarted = ref(false);
+
+// Функции для обработки свайпа
+const handleTouchStart = (event) => {
+  if (!isOpen.value) return;
+
+  const touch = event.touches[0];
+  touchStartX.value = touch.clientX;
+  touchStartY.value = touch.clientY;
+  isSwipeStarted.value = false;
+};
+
+const handleTouchMove = (event) => {
+  if (!isOpen.value) return;
+
+  const touch = event.touches[0];
+  const deltaX = touch.clientX - touchStartX.value;
+  const deltaY = touch.clientY - touchStartY.value;
+
+  // Проверяем, что это горизонтальный свайп (больше движения по X, чем по Y)
+  if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 10) {
+    isSwipeStarted.value = true;
+    // Предотвращаем скролл страницы при свайпе
+    event.preventDefault();
+  }
+};
+
+const handleTouchEnd = (event) => {
+  if (!isOpen.value || !isSwipeStarted.value) return;
+
+  const touch = event.changedTouches[0];
+  const deltaX = touch.clientX - touchStartX.value;
+
+  // Если свайп влево (в сторону закрытия) больше 50px, закрываем меню
+  if (deltaX < -50) {
+    isOpen.value = false;
+  }
+
+  isSwipeStarted.value = false;
+};
+
+// Синхронизируем состояние с глобальным менеджером
+watch(leftMenuOpen, (newValue) => {
+  if (!newValue && isOpen.value) {
+    // Если глобальное состояние закрыто, но локальное открыто - закрываем локальное
+    isOpen.value = false;
+  }
+});
 </script>
 
 <style scoped>
@@ -129,7 +192,7 @@ const { isOpen, menuRef: navLeftRef, updatePosition } = useMenu("left");
 
 .sub-link {
   color: #ffffff8e !important;
-  font-size: clamp(8px, 1vw, 10px) !important;
+  font-size: clamp(8px, 1vw, 10px);
   font-weight: 400 !important;
   transition: var(--tran);
 }
@@ -173,5 +236,14 @@ const { isOpen, menuRef: navLeftRef, updatePosition } = useMenu("left");
   width: 100%;
   margin: 4% 0;
   font-size: clamp(10px, 0.8vw, 12px);
+}
+@media (max-width: 768px) {
+  .main-link {
+    font-size: 20px;
+  }
+  .nav-left-menu ul li a.sub-link {
+    font-size: 14px !important;
+    line-height: 2;
+  }
 }
 </style>

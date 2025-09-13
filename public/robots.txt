@@ -1,16 +1,19 @@
 User-Agent: *
-Disallow: /
+Allow: /
 
-# Запрет для всех ботов
+# Sitemap
+Sitemap: https://thebrus.ru/sitemap.xml
+
+# Основные поисковые системы
+User-Agent: Googlebot
+Allow: /
+
+User-Agent: Bingbot
+Allow: /
+
+User-Agent: YandexBot
+Allow: /
+
+# Ограничения для агрессивных ботов
 User-Agent: *
-Crawl-Delay: 86400
-
-# Разрешение только для основных поисковых систем (опционально)
-# User-Agent: Googlebot
-# Disallow:
-
-# User-Agent: Bingbot
-# Disallow:
-
-# User-Agent: YandexBot
-# Disallow:
+Crawl-Delay: 1

@@ -468,15 +468,15 @@
   display: flex;
 }
 .item-con .bad::before {
-  content: url(/public/svg/cart/1.svg);
+  content: url(/svg/cart/1.svg);
   margin-right: 10px;
 }
 .item-con .san::before {
-  content: url(/public/svg/cart/2.svg);
+  content: url(/svg/cart/2.svg);
   margin-right: 10px;
 }
 .item-con .gard::before {
-  content: url(/public/svg/cart/3.svg);
+  content: url(/svg/cart/3.svg);
   margin-right: 10px;
 }
 
@@ -518,27 +518,27 @@
   color: #fff;
 }
 .fund::before {
-  content: url(/public/svg/cart/item/1.svg);
+  content: url(/svg/cart/item/1.svg);
   margin-right: 20px;
 }
 .sten::before {
-  content: url(/public/svg/cart/item/2.svg);
+  content: url(/svg/cart/item/2.svg);
   margin-right: 20px;
 }
 .crov::before {
-  content: url(/public/svg/cart/item/3.svg);
+  content: url(/svg/cart/item/3.svg);
   margin-right: 20px;
 }
 .okn::before {
-  content: url(/public/svg/cart/item/4.svg);
+  content: url(/svg/cart/item/4.svg);
   margin-right: 20px;
 }
 .lk::before {
-  content: url(/public/svg/cart/item/6.svg);
+  content: url(/svg/cart/item/6.svg);
   margin-right: 20px;
 }
 .stroy::before {
-  content: url(/public/svg/cart/item/5.svg);
+  content: url(/svg/cart/item/5.svg);
   margin-right: 20px;
 }
 
@@ -561,6 +561,163 @@
 
 .view:hover svg {
   transform: scale(1.1);
+}
+
+/* Мобильная адаптация */
+@media (max-width: 768px) {
+  .b1 {
+    height: 60vh;
+  }
+
+  .slider-container {
+    position: relative;
+  }
+
+  .slider-indicators {
+    bottom: 15px;
+    right: 50%;
+    transform: translateX(50%);
+    gap: 6px;
+  }
+
+  .indicator {
+    width: 10px;
+    height: 10px;
+  }
+
+  .b2 {
+    padding: 20px;
+  }
+
+  .b2-title {
+    flex-direction: column;
+    height: auto;
+    gap: 20px;
+    align-items: center;
+    text-align: center;
+  }
+
+  .b2-title h1 {
+    font-size: clamp(24px, 6vw, 36px);
+    margin-bottom: 10px;
+  }
+
+  .house-title-btn {
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+    max-width: 400px;
+  }
+
+  .house-title-btn .btn {
+    width: 100%;
+    padding: 15px 20px;
+    font-size: 16px;
+    min-height: 48px;
+    touch-action: manipulation;
+  }
+
+  .view {
+    width: 50px;
+    height: 50px;
+    margin: 0;
+  }
+
+  .b2-content {
+    flex-direction: column;
+    gap: 30px;
+  }
+
+  .house-spec {
+    width: 100%;
+  }
+
+  .house-text {
+    width: 100%;
+  }
+
+  .house-text p {
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  .house-spec .price h2 {
+    font-size: clamp(24px, 5vw, 32px);
+    margin-bottom: 20px;
+  }
+
+  .house-spec .area p {
+    font-size: 18px;
+    margin-bottom: 20px;
+  }
+
+  .item-con {
+    margin: 20px 0;
+  }
+
+  .item {
+    margin: 15px 0;
+    font-size: 16px;
+  }
+
+  .item-con .bad::before,
+  .item-con .san::before,
+  .item-con .gard::before {
+    margin-right: 15px;
+  }
+
+  .b3 {
+    margin-bottom: 10vh;
+  }
+
+  .b3-title {
+    height: auto;
+    padding: 20px;
+    text-align: center;
+  }
+
+  .b3-title h3 {
+    font-size: clamp(20px, 4vw, 28px);
+  }
+
+  .b3-text-con {
+    padding: 20px 40px;
+    flex-direction: column;
+    gap: 30px;
+  }
+
+  .b3-text {
+    width: 100%;
+  }
+
+  .b3-text h3 {
+    font-size: 18px;
+    margin-bottom: 15px;
+  }
+
+  .b3-text ul li {
+    font-size: 14px;
+    line-height: 1.8;
+    margin: 10px 0;
+  }
+
+  .fund::before,
+  .sten::before,
+  .crov::before,
+  .okn::before,
+  .lk::before,
+  .stroy::before {
+    margin-right: 15px;
+  }
+
+  /* Отключаем tooltip на мобильных */
+  .b3-item ul li {
+    cursor: default;
+  }
+
+  .b3-item ul li:hover {
+    color: var(--grey);
+  }
 }
 </style>
 
@@ -833,7 +990,7 @@ const currentImage = computed(() => {
   return (
     productImages.value[currentImageIndex.value] ||
     houseImg.value ||
-    "/public/img/1.jpg"
+    "/img/1.jpg"
   );
 });
 
@@ -850,26 +1007,35 @@ const formattedPrice = computed(() => {
 
 // SEO мета-теги
 useHead({
-  title: houseTitle.value || "Заказать дом - TheBrus",
+  title: houseTitle.value
+    ? `${houseTitle.value} - Каркасный дом под ключ | TheBrus`
+    : "Заказать каркасный дом под ключ - TheBrus",
   meta: [
     {
       name: "description",
       content: houseTitle.value
-        ? `Проект дома ${houseTitle.value} площадью ${area.value} м² за ${formattedPrice.value}`
-        : "Контакты проекта TheBrus - свяжитесь с нами для сотрудничества",
+        ? `Проект каркасного дома ${houseTitle.value} площадью ${area.value} м² за ${formattedPrice.value}. Строительство каркасных домов под ключ в Москве и МО.`
+        : "Заказать строительство каркасного дома под ключ в Москве и Московской области. Каркасно-щитовые дома, дома из клееного бруса.",
     },
     {
       name: "keywords",
-      content: "контакты, связь, обратная связь, сотрудничество, заказать дом",
+      content:
+        "заказать каркасный дом, строительство каркасного дома под ключ, каркасный дом цена, стоимость каркасного дома, заказать дом под ключ, строительство каркасных домов в москве, строительство каркасных домов в московской области, каркасно щитовые дома, дома из клееного бруса, каркасник под ключ московская область, стоимость каркасника под ключ, каркасный дом под ключ с ремонтом цена",
     },
-    { property: "og:title", content: houseTitle.value || "Контакты - TheBrus" },
+    {
+      property: "og:title",
+      content: houseTitle.value
+        ? `${houseTitle.value} - Каркасный дом под ключ | TheBrus`
+        : "Заказать каркасный дом под ключ - TheBrus",
+    },
     {
       property: "og:description",
       content: houseTitle.value
-        ? `Проект дома ${houseTitle.value}`
-        : "Контакты проекта TheBrus",
+        ? `Проект каркасного дома ${houseTitle.value} - строительство под ключ в Москве и МО`
+        : "Заказать строительство каркасного дома под ключ в Москве и Московской области",
     },
     { property: "og:type", content: "website" },
+    { property: "og:locale", content: "ru_RU" },
   ],
 });
 </script>

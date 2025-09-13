@@ -1,12 +1,13 @@
 <template>
   <swiper
-    :slidesPerView="4"
-    :spaceBetween="30"
+    :slidesPerView="slidesPerView"
+    :spaceBetween="spaceBetween"
     :speed="1000"
     :modules="modules"
     class="mySwiper"
     @swiper="onSwiper"
     @slideChange="onSlideChange"
+    :breakpoints="breakpoints"
   >
     <swiper-slide
       v-for="(slide, index) in slides"
@@ -45,6 +46,25 @@ export default {
     const firstVisibleIndex = ref(0);
     const lastVisibleIndex = ref(4); // 5 слайдов на экран, последний индекс = 4
     let hoverTimeout = null;
+
+    // Адаптивные параметры для разных размеров экрана
+    const slidesPerView = ref(4);
+    const spaceBetween = ref(30);
+
+    const breakpoints = {
+      320: {
+        slidesPerView: 1,
+        spaceBetween: 20,
+      },
+      768: {
+        slidesPerView: 2,
+        spaceBetween: 25,
+      },
+      1024: {
+        slidesPerView: 4,
+        spaceBetween: 30,
+      },
+    };
 
     const slides = [
       {
@@ -109,6 +129,11 @@ export default {
     };
 
     const onSlideHover = (index) => {
+      // Проверяем, что это не мобильное устройство
+      if (window.innerWidth <= 768) {
+        return;
+      }
+
       console.log(
         "Hover on slide:",
         index,
@@ -166,6 +191,9 @@ export default {
       slides,
       firstVisibleIndex,
       lastVisibleIndex,
+      slidesPerView,
+      spaceBetween,
+      breakpoints,
       onSwiper,
       onSlideChange,
       onSlideHover,
@@ -234,5 +262,46 @@ export default {
 }
 .slide-text-con img {
   width: 20%;
+}
+
+/* Мобильная адаптация слайдера */
+@media (max-width: 768px) {
+  .mySwiper {
+    height: 300px;
+  }
+
+  .swiper-slide {
+    clip-path: polygon(0 0, 100% 0, 100% 95%, 95% 100%, 5% 100%, 0 95%);
+  }
+
+  .slide-text-con {
+    display: flex;
+    padding: 3% 3%;
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+    flex-direction: row;
+  }
+
+  .slide-text-con span {
+    text-align: center;
+    font-size: 16px;
+    width: 100%;
+    line-height: 1.4;
+  }
+
+  .slide-text-con img {
+    width: 20%;
+    max-width: 80px;
+  }
+
+  .slide-img {
+    left: -5%;
+    width: 110%;
+  }
+
+  .swiper-slide:hover .slide-img {
+    transform: translateY(-35%);
+  }
 }
 </style>
