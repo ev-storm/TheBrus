@@ -4,13 +4,18 @@ import FavoritesButton from "./FavoritesButton.vue";
 import { useRouter } from "vue-router";
 import { useSelectedProject } from "~/composables/useSelectedProject";
 import { useMenu } from "~/composables/useMenu";
+import { useImageLoader } from "~/composables/useImageLoader";
+import { usePlanLoader } from "~/composables/usePlanLoader";
 
 const props = defineProps({
   title: { type: String, required: true },
   price: { type: [Number, String], required: true },
   area: { type: [Number, String], required: true },
-  // Изображения. Если передан только img — используется для всех зон
+  // Путь к папке с изображениями
+  imagesFolder: { type: String, required: false },
+  // Обратная совместимость - если передан только img, используется для всех зон
   img: { type: String, required: false },
+  // Обратная совместимость - старые свойства изображений
   img1: { type: String, required: false },
   img2: { type: String, required: false },
   img3: { type: String, required: false },
@@ -38,7 +43,30 @@ const formattedPrice = computed(() => {
   return new Intl.NumberFormat("ru-RU").format(numeric) + " ₽";
 });
 
-const images = computed(() => {
+// Инициализируем загрузчик изображений
+const { images, loadImages, firstImage, imageCount } = useImageLoader(
+  props.imagesFolder
+);
+
+// Инициализируем загрузчик планов
+const { plans, loadPlans, planCount } = usePlanLoader(props.imagesFolder);
+
+// Загружаем изображения и планы при монтировании компонента
+onMounted(() => {
+  if (props.imagesFolder) {
+    loadImages();
+    loadPlans();
+  }
+});
+
+// Computed для получения изображений с обратной совместимостью
+const imagesList = computed(() => {
+  // Если есть новая логика с папкой изображений
+  if (props.imagesFolder && images.value.length > 0) {
+    return images.value;
+  }
+
+  // Обратная совместимость со старой логикой
   const fallback = props.img || "";
   return [
     props.img1 || fallback,
@@ -46,7 +74,12 @@ const images = computed(() => {
     props.img3 || fallback,
     props.img4 || fallback,
     props.img5 || fallback,
-  ];
+  ].filter(Boolean); // Убираем пустые значения
+});
+
+// Computed для получения текущего изображения
+const currentImage = computed(() => {
+  return imagesList.value[hoveredIndex.value] || imagesList.value[0] || "";
 });
 
 const router = useRouter();
@@ -54,7 +87,6 @@ const { setSelectedProject } = useSelectedProject();
 const { openMenu } = useMenu("right");
 
 const hoveredIndex = ref(0);
-const currentImage = computed(() => images.value[hoveredIndex.value] || "");
 
 // Состояние модального окна
 const isModalOpen = ref(false);
@@ -66,16 +98,22 @@ const planModalIndex = ref(0);
 
 // Планы для модального окна
 const planImages = computed(() => {
-  const plans = [];
-  if (props.sh) plans.push(props.sh);
-  if (props.sh2) plans.push(props.sh2);
-  if (props.sh3) plans.push(props.sh3);
-  return plans;
+  // Если есть новая логика с папкой планов
+  if (props.imagesFolder && plans.value.length > 0) {
+    return plans.value;
+  }
+
+  // Обратная совместимость со старой логикой
+  const oldPlans = [];
+  if (props.sh) oldPlans.push(props.sh);
+  if (props.sh2) oldPlans.push(props.sh2);
+  if (props.sh3) oldPlans.push(props.sh3);
+  return oldPlans;
 });
 
 // Фильтруем изображения для модального окна (только существующие)
 const modalImages = computed(() => {
-  return images.value.filter((img) => img && img.trim() !== "");
+  return imagesList.value.filter((img) => img && img.trim() !== "");
 });
 
 function handleEnter(index) {
@@ -204,16 +242,11 @@ onUnmounted(() => {
 });
 
 function goToHouseDetails() {
-  // Передаем данные о доме через query параметры
+  // Передаем только ID продукта
   router.push({
     path: "/house",
     query: {
-      houseTitle: props.title,
-      price: props.price,
-      area: props.area,
-      houseImg: props.img || images.value[0],
-      description: props.description || "",
-      pdf: props.pdf || "",
+      id: props.cardId,
     },
   });
 }
@@ -247,10 +280,12 @@ function handleOrder() {
       <div class="badge">
         <img src="/svg/logo/logo.svg" alt="logo" />
       </div>
-      <div class="dots">
-        <span :class="{ active: hoveredIndex === 0 }"></span>
-        <span :class="{ active: hoveredIndex === 1 }"></span>
-        <span :class="{ active: hoveredIndex === 2 }"></span>
+      <div class="dots" v-if="imagesList.length > 1">
+        <span
+          v-for="(image, index) in imagesList.slice(0, 3)"
+          :key="index"
+          :class="{ active: hoveredIndex === index }"
+        ></span>
       </div>
     </div>
     <div class="content">
@@ -258,6 +293,7 @@ function handleOrder() {
         <h3 class="title">{{ title }}</h3>
         <div>
           <div class="price">
+            <p>~&nbsp;</p>
             {{ formattedPrice }}
           </div>
           <div class="area">{{ area }} м²</div>

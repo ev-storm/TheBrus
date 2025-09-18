@@ -93,7 +93,7 @@ const initMapWithYMaps3 = (ymaps3) => {
     // Создаем карту с координатами Варсонофьевского переулка
     map = new YMap(mapContainer.value, {
       location: {
-        center: [37.613575, 55.765635], // Варсонофьевский переулок, 10с2, Москва [долгота, широта]
+        center: [37.654394, 55.712472],
         zoom: 17,
       },
       behaviors: ["drag", "scrollZoom"],
@@ -165,7 +165,7 @@ const initMapWithYMaps3 = (ymaps3) => {
     controls = [controlsContainer];
 
     // Координаты для маркера
-    const coords = [37.613575, 55.765635]; // Варсонофьевский переулок, 10с2, Москва [долгота, широта]
+    const coords = [37.654394, 55.712472]; // улица Ленинская Слобода, 26с28
 
     // Создаем маркер с кастомной SVG иконкой
     const markerEl = document.createElement("div");

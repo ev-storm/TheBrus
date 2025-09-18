@@ -1,4 +1,5 @@
 import { ref, onMounted, onUnmounted } from "vue";
+import { useMenuManager } from "./useMenuManager";
 
 export const useMenu = (menuType = "left") => {
   const isOpen = ref(false);
@@ -7,21 +8,34 @@ export const useMenu = (menuType = "left") => {
   const eventName = menuType === "left" ? "toggleMenu" : "toggleRightMenu";
 
   const openMenu = () => {
-    isOpen.value = true;
-    window.dispatchEvent(
-      new CustomEvent(eventName, {
-        detail: { isOpen: true },
-      })
+    console.log(
+      `useMenu openMenu вызвана для ${menuType}, eventName: ${eventName}`
     );
+    isOpen.value = true;
+
+    // Обновляем глобальное состояние через useMenuManager
+    if (menuType === "right") {
+      const { openRightMenu } = useMenuManager();
+      openRightMenu();
+    } else {
+      const { openLeftMenu } = useMenuManager();
+      openLeftMenu();
+    }
+
+    console.log(`useMenu событие ${eventName} отправлено`);
   };
 
   const closeMenu = () => {
     isOpen.value = false;
-    window.dispatchEvent(
-      new CustomEvent(eventName, {
-        detail: { isOpen: false },
-      })
-    );
+
+    // Обновляем глобальное состояние через useMenuManager
+    if (menuType === "right") {
+      const { closeRightMenu } = useMenuManager();
+      closeRightMenu();
+    } else {
+      const { closeLeftMenu } = useMenuManager();
+      closeLeftMenu();
+    }
   };
 
   const toggleMenu = () => {
@@ -54,6 +68,14 @@ export const useMenu = (menuType = "left") => {
     if (
       event.target.classList.contains("order-btn") ||
       event.target.closest(".order-btn")
+    ) {
+      return;
+    }
+
+    // Не закрываем меню, если клик по кнопке "Изменить планировку" или её дочерним элементам
+    if (
+      event.target.classList.contains("swap-plan") ||
+      event.target.closest(".swap-plan")
     ) {
       return;
     }

@@ -1,6 +1,15 @@
 <template>
   <div class="form-nav">
     <form @submit.prevent="handleSubmit" class="form-container">
+      <div class="form-field" v-if="selectedProject?.planChangeRequest">
+        <input
+          v-model="form.planChangeRequest"
+          type="text"
+          placeholder="Запрос на изменение плана"
+          class="form-input project-input plan-request-input"
+          readonly
+        />
+      </div>
       <div class="form-field" v-if="selectedProject">
         <input
           v-model="form.projectName"
@@ -68,6 +77,7 @@ const form = ref({
   name: "",
   phone: "",
   projectName: "",
+  planChangeRequest: "",
 });
 
 const isPolicyAccepted = ref(false);
@@ -106,14 +116,26 @@ const handleSubmit = async () => {
   }
 
   // Подготовка данных для отправки
+  let message = selectedProject.value
+    ? `Клиент заинтересован в проекте "${selectedProject.value.title}" и хочет получить консультацию.`
+    : "Клиент оставил заявку на обратную связь.";
+
+  // Если это запрос на изменение плана, добавляем соответствующую информацию
+  if (
+    selectedProject.value?.planChangeRequest &&
+    form.value.planChangeRequest
+  ) {
+    message += `\n\nЗапрос на изменение плана: ${form.value.planChangeRequest}`;
+  }
+
   const emailData = {
     name: form.value.name,
     phone: form.value.phone,
-    message: selectedProject.value
-      ? `Клиент заинтересован в проекте "${selectedProject.value.title}" и хочет получить консультацию.`
-      : "Клиент оставил заявку на обратную связь.",
+    message: message,
     email: "", // Нет email поля в форме
-    formType: "feedback", // Тип формы для темы письма
+    formType: selectedProject.value?.planChangeRequest
+      ? "plan_change"
+      : "feedback", // Тип формы для темы письма
   };
 
   // Отправка письма
@@ -125,6 +147,7 @@ const handleSubmit = async () => {
       name: "",
       phone: "",
       projectName: "",
+      planChangeRequest: "",
     };
     isPolicyAccepted.value = false;
   }
@@ -213,6 +236,12 @@ const handleSubmit = async () => {
 .project-input::placeholder {
   color: #fff !important;
   font-weight: 500;
+}
+
+.plan-request-input::placeholder {
+  color: #fff !important;
+  font-weight: 300;
+  font-size: 12px;
 }
 
 .notification {

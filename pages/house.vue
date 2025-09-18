@@ -34,29 +34,46 @@
       <div class="b2-title">
         <h1 class="house-title">{{ houseTitle || "Название Проекта" }}</h1>
         <div class="house-title-btn">
-          <button class="btn pdf" @click="downloadPDF" :disabled="!pdfUrl">
+          <!-- <button class="btn pdf" @click="downloadPDF" :disabled="!pdfUrl">
             Скачать презентацию
-          </button>
+          </button> -->
           <button class="btn order-btn" @click="handleOrder">Заказать</button>
-          <div class="view" @click="openModal">
-            <svg
-              width="29"
-              height="16"
-              viewBox="0 0 29 16"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M20.0981 6.51556C20.0981 9.53023 17.6543 11.9741 14.6396 11.9741C11.6249 11.9741 9.18104 9.53023 9.18104 6.51556C9.18104 3.50089 11.6249 1.05701 14.6396 1.05701C17.6543 1.05701 20.0981 3.50089 20.0981 6.51556Z"
-                stroke="white"
-                stroke-width="1.3"
-              />
-              <path
-                d="M27.7844 8.03842C28.0391 8.24732 28.0271 8.64218 27.7584 8.83272C22.4524 12.5953 18.8943 14.6956 14.6398 14.6956C10.3589 14.6956 7.18713 13.2781 1.45403 8.81807C1.21033 8.62849 1.19762 8.26263 1.42628 8.05515C7.2541 2.76743 10.1187 0.83139 14.6398 0.83139C19.1459 0.83139 21.8692 3.18654 27.7844 8.03842Z"
-                stroke="white"
-                stroke-width="1.3"
-              />
-            </svg>
+          <div class="order-btn-content">
+            <div class="plan" @click="openPlanModal" v-if="plans.length > 0">
+              <svg
+                width="19"
+                height="18"
+                viewBox="0 0 19 18"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M6.10809 1.33344L1.6801 1.33344C1.62488 1.33344 1.5801 1.37821 1.5801 1.43343L1.58008 17.1926C1.58008 17.2478 1.62485 17.2926 1.68008 17.2926H12.5193M6.10809 1.33344L6.10809 9.77018C6.10809 9.82541 6.15286 9.87018 6.20809 9.87018L11.0491 9.87018M6.10809 1.33344L13.7239 1.33344M13.7239 1.33344L17.4393 1.33344C17.4945 1.33344 17.5393 1.37821 17.5393 1.43344V17.1926C17.5393 17.2478 17.4945 17.2926 17.4393 17.2926H12.5193M13.7239 1.33344V5.73785C13.7239 5.79308 13.6792 5.83785 13.6239 5.83785L10.675 5.83785M6.24328 13.5908L12.4193 13.5908C12.4746 13.5908 12.5193 13.6356 12.5193 13.6908V17.2926"
+                  stroke="white"
+                  stroke-width="1.3"
+                />
+              </svg>
+            </div>
+            <div class="view" @click="openModal">
+              <svg
+                width="29"
+                height="16"
+                viewBox="0 0 29 16"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M20.0981 6.51556C20.0981 9.53023 17.6543 11.9741 14.6396 11.9741C11.6249 11.9741 9.18104 9.53023 9.18104 6.51556C9.18104 3.50089 11.6249 1.05701 14.6396 1.05701C17.6543 1.05701 20.0981 3.50089 20.0981 6.51556Z"
+                  stroke="white"
+                  stroke-width="1.3"
+                />
+                <path
+                  d="M27.7844 8.03842C28.0391 8.24732 28.0271 8.64218 27.7584 8.83272C22.4524 12.5953 18.8943 14.6956 14.6398 14.6956C10.3589 14.6956 7.18713 13.2781 1.45403 8.81807C1.21033 8.62849 1.19762 8.26263 1.42628 8.05515C7.2541 2.76743 10.1187 0.83139 14.6398 0.83139C19.1459 0.83139 21.8692 3.18654 27.7844 8.03842Z"
+                  stroke="white"
+                  stroke-width="1.3"
+                />
+              </svg>
+            </div>
           </div>
         </div>
       </div>
@@ -69,19 +86,51 @@
             <p>{{ area || "203" }} м²</p>
           </div>
           <div class="item-con">
-            <div class="item bad"><p>3 Спальни</p></div>
-            <div class="item san"><p>2 Санузла</p></div>
-            <div class="item gard"><p>1 Гардеробная</p></div>
+            <div class="item bad">
+              <p>
+                {{ badRoom }}
+                {{
+                  badRoom === 1 ? "Спальня" : badRoom < 5 ? "Спальни" : "Спален"
+                }}
+              </p>
+            </div>
+            <div class="item san">
+              <p>
+                {{ sanRoom }}
+                {{
+                  sanRoom === 1
+                    ? "Санузел"
+                    : sanRoom < 5
+                    ? "Санузла"
+                    : "Санузлов"
+                }}
+              </p>
+            </div>
+            <div class="item gard">
+              <p>
+                {{ dressRoom }}
+                {{
+                  dressRoom === 1
+                    ? "Гардеробная"
+                    : dressRoom < 5
+                    ? "Гардеробные"
+                    : "Гардеробных"
+                }}
+              </p>
+            </div>
           </div>
-          <button class="btn">Изменить планировку</button>
+          <button class="btn swap-plan" @click="handleSwapPlan">
+            Изменить планировку
+          </button>
         </div>
         <div class="house-text">
-          <p class="house-description">
-            {{
+          <p
+            class="house-description"
+            v-html="
               description ||
-              "Описание проекта будет добавлено в ближайшее время."
-            }}
-          </p>
+              'Описание проекта будет добавлено в ближайшее время.'
+            "
+          ></p>
         </div>
       </div>
     </div>
@@ -288,6 +337,7 @@
         </div>
       </div>
     </div>
+    <SliderCartProduct />
   </div>
 
   <!-- Модальное окно для просмотра изображений -->
@@ -299,6 +349,88 @@
     @close="closeModal"
     @update:isOpen="isModalOpen = $event"
   />
+
+  <!-- Модальное окно для просмотра планов -->
+  <Teleport to="body">
+    <div
+      v-if="isPlanModalOpen"
+      class="modal-overlay"
+      @click="handlePlanModalClick"
+    >
+      <div class="modal-container" @click.stop>
+        <!-- Левая кликабельная область -->
+        <div
+          class="modal-nav-left"
+          @click.stop="prevPlanImage"
+          v-if="plans.length > 1"
+        ></div>
+
+        <!-- Правая кликабельная область -->
+        <div
+          class="modal-nav-right"
+          @click.stop="nextPlanImage"
+          v-if="plans.length > 1"
+        ></div>
+
+        <!-- Изображение плана -->
+        <img
+          v-if="plans[planModalIndex]"
+          :src="plans[planModalIndex]"
+          :alt="houseTitle + ' - План'"
+          class="modal-image"
+        />
+
+        <!-- Стрелки навигации -->
+        <div class="modal-arrows" v-if="plans.length > 1">
+          <div class="modal-arrow-left" @click.stop="prevPlanImage">
+            <svg
+              width="80"
+              height="80"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M15 18L9 12L15 6"
+                stroke="white"
+                stroke-width="1"
+                stroke-linecap="square"
+                stroke-linejoin="miter"
+              />
+            </svg>
+          </div>
+          <div class="modal-arrow-right" @click.stop="nextPlanImage">
+            <svg
+              width="80"
+              height="80"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M9 18L15 12L9 6"
+                stroke="white"
+                stroke-width="1"
+                stroke-linecap="square"
+                stroke-linejoin="miter"
+              />
+            </svg>
+          </div>
+        </div>
+
+        <!-- Индикаторы планов -->
+        <div class="modal-indicators" v-if="plans.length > 1">
+          <div
+            v-for="(plan, index) in plans"
+            :key="index"
+            class="modal-indicator"
+            :class="{ active: index === planModalIndex }"
+            @click.stop="planModalIndex = index"
+          ></div>
+        </div>
+      </div>
+    </div>
+  </Teleport>
 </template>
 
 <style scoped>
@@ -428,6 +560,10 @@
 .tooltip.show {
   opacity: 1;
 }
+.order-btn-content {
+  display: flex;
+  align-items: center;
+}
 
 /* Стили для элементов списка с tooltip */
 .b3-item ul li {
@@ -543,13 +679,13 @@
 }
 
 /* Стили для кнопки view */
-.view {
+.view,
+.plan {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 40px;
   height: 40px;
-
   cursor: pointer;
   transition: all 0.3s ease;
   margin-left: 10px;
@@ -719,25 +855,173 @@
     color: var(--grey);
   }
 }
+
+/* Стили для модалки планов (как у ImageModal) */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  backdrop-filter: blur(15px);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal-container {
+  position: relative;
+  width: auto;
+  height: 80vh;
+  max-width: 1500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: default;
+  transform: scale(0.9);
+  animation: scaleIn 0.3s ease-out forwards;
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.98);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.modal-image {
+  width: auto;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 0px;
+  cursor: default;
+}
+
+/* Кликабельные области для навигации */
+.modal-nav-left,
+.modal-nav-right {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 50%;
+  z-index: 5;
+  cursor: pointer;
+}
+
+.modal-nav-left {
+  left: 0;
+}
+
+.modal-nav-right {
+  right: 0;
+}
+
+/* Стрелки навигации */
+.modal-arrows {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
+  display: flex;
+  justify-content: space-between;
+  padding: 0 20px;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.modal-arrow-left,
+.modal-arrow-right {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0.3;
+  transition: opacity 0.1s ease-in-out, background-color 0.5s ease;
+  pointer-events: all;
+}
+
+/* Эффекты при наведении на левую/правую части */
+.modal-nav-left:hover ~ .modal-arrows .modal-arrow-left {
+  opacity: 1;
+}
+
+.modal-nav-right:hover ~ .modal-arrows .modal-arrow-right {
+  opacity: 1;
+}
+
+/* Индикаторы планов */
+.modal-indicators {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 2;
+}
+
+.modal-indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.modal-indicator.active {
+  background: white;
+}
+
+.modal-indicator:hover {
+  background: rgba(255, 255, 255, 0.8);
+}
 </style>
 
 <script setup>
 import { computed, ref, onMounted, nextTick } from "vue";
 import { useRoute } from "vue-router";
 import productsData from "~/data/products.js";
+import portfolioData from "~/data/portfoli.js";
 import ImageModal from "~/components/ImageModal.vue";
+import SliderCartProduct from "~/components/SliderCartProduct.vue";
 import { useSelectedProject } from "~/composables/useSelectedProject";
 import { useMenu } from "~/composables/useMenu";
+import { useImageLoader } from "~/composables/useImageLoader";
+import { usePlanLoader } from "~/composables/usePlanLoader";
 
 const route = useRoute();
 
 // Получаем данные из query параметров
-const houseTitle = ref(route.query.houseTitle || "");
-const price = ref(route.query.price || "");
-const area = ref(route.query.area || "");
-const houseImg = ref(route.query.houseImg || "");
-const description = ref(route.query.description || "");
-const pdfUrl = ref(route.query.pdf || "");
+const productId = ref(route.query.id || "");
+const houseTitle = ref("");
+const price = ref("");
+const area = ref("");
+const description = ref("");
+const pdfUrl = ref("");
+const imagesFolder = ref("");
+const houseImg = ref("");
+const badRoom = ref(0);
+const sanRoom = ref(0);
+const dressRoom = ref(0);
 
 // Данные продукта
 const productData = ref(null);
@@ -746,9 +1030,23 @@ const productData = ref(null);
 const currentImageIndex = ref(0);
 const productImages = ref([]);
 
+// Инициализируем загрузчик изображений
+const {
+  images,
+  loadImages,
+  isLoading: imagesLoading,
+} = useImageLoader(imagesFolder.value);
+
+// Инициализируем загрузчик планов
+const { plans, loadPlans } = usePlanLoader(imagesFolder.value);
+
 // Модальное окно
 const isModalOpen = ref(false);
 const modalImageIndex = ref(0);
+
+// Состояние модального окна для планов
+const isPlanModalOpen = ref(false);
+const planModalIndex = ref(0);
 
 // Composables для заказа
 const { setSelectedProject } = useSelectedProject();
@@ -756,13 +1054,65 @@ const { openMenu } = useMenu("right");
 
 // Получаем данные конкретного продукта
 const getProductData = () => {
-  // Если передан houseImg, ищем продукт по этому изображению
+  console.log("getProductData вызвана с productId:", productId.value);
+  console.log("productsData:", productsData);
+  console.log("portfolioData:", portfolioData);
+
+  // Если передан ID, ищем продукт по ID в обоих массивах
+  if (productId.value) {
+    // Сначала ищем в products
+    if (productsData && Array.isArray(productsData)) {
+      let product = productsData.find((p) => p && p.id === productId.value);
+      if (product) {
+        console.log("Найден продукт в products:", product);
+        return product;
+      }
+    }
+
+    // Если не найден в products, ищем в portfolio
+    if (portfolioData && Array.isArray(portfolioData)) {
+      let product = portfolioData.find((p) => p && p.id === productId.value);
+      if (product) {
+        console.log("Найден продукт в portfolio:", product);
+        return product;
+      }
+    }
+
+    console.log("Продукт не найден ни в products, ни в portfolio");
+  }
+
+  // Fallback: ищем по imagesFolder (обратная совместимость)
+  if (imagesFolder.value) {
+    // Сначала ищем в products
+    if (productsData && Array.isArray(productsData)) {
+      let product = productsData.find(
+        (p) => p && p.imagesFolder === imagesFolder.value
+      );
+      if (product) {
+        return product;
+      }
+    }
+
+    // Если не найден в products, ищем в portfolio
+    if (portfolioData && Array.isArray(portfolioData)) {
+      let product = portfolioData.find(
+        (p) => p && p.imagesFolder === imagesFolder.value
+      );
+      if (product) {
+        return product;
+      }
+    }
+  }
+
+  // Fallback: ищем по houseImg (обратная совместимость)
   if (houseImg.value) {
     const product = productsData.find(
       (p) =>
         p.img1 === houseImg.value ||
         p.img2 === houseImg.value ||
-        p.img3 === houseImg.value
+        p.img3 === houseImg.value ||
+        p.img4 === houseImg.value ||
+        p.img5 === houseImg.value
     );
     if (product) {
       return product;
@@ -770,12 +1120,34 @@ const getProductData = () => {
   }
 
   // Если не найден, берем первый продукт
-  return productsData[0];
+  if (productsData && Array.isArray(productsData) && productsData.length > 0) {
+    return productsData[0];
+  }
+
+  // Если productsData пустой, берем первый из portfolio
+  if (
+    portfolioData &&
+    Array.isArray(portfolioData) &&
+    portfolioData.length > 0
+  ) {
+    return portfolioData[0];
+  }
+
+  // Если ничего нет, возвращаем пустой объект
+  return {};
 };
 
 // Получаем изображения конкретного продукта
 const getProductImages = () => {
   const product = getProductData();
+
+  // Если есть новая логика с папкой изображений
+  if (product.imagesFolder) {
+    loadImages();
+    return images.value;
+  }
+
+  // Обратная совместимость со старой логикой
   return [
     product.img1,
     product.img2,
@@ -787,31 +1159,59 @@ const getProductImages = () => {
 
 // Инициализируем данные
 onMounted(() => {
-  // Получаем данные продукта для изображений
+  console.log("onMounted вызван");
+  console.log("productId.value:", productId.value);
+  console.log("productsData в onMounted:", productsData);
+  console.log("portfolioData в onMounted:", portfolioData);
+
+  // Получаем данные продукта
   productData.value = getProductData();
 
-  // Если description и pdf не переданы в query, берем из данных продукта
-  if (!description.value) {
-    description.value = productData.value?.description || "";
-  }
-  if (!pdfUrl.value) {
-    pdfUrl.value = productData.value?.pdf || "";
+  // Заполняем данные из найденного продукта
+  if (productData.value) {
+    houseTitle.value = productData.value.name || "";
+    price.value = productData.value.price || "";
+    area.value = productData.value.area || "";
+    description.value = productData.value.description || "";
+    pdfUrl.value = productData.value.pdf || "";
+    imagesFolder.value = productData.value.imagesFolder || "";
+    badRoom.value = productData.value["bad-room"] || 0;
+    sanRoom.value = productData.value["san-room"] || 0;
+    dressRoom.value = productData.value["dress-room"] || 0;
   }
 
-  // Получаем изображения
-  productImages.value = getProductImages();
+  // Сбрасываем индекс изображения
+  currentImageIndex.value = 0;
 
-  // Если переданное изображение есть в списке, начинаем с него
-  if (houseImg.value) {
-    const index = productImages.value.findIndex(
-      (img) => img === houseImg.value
+  // Инициализируем загрузчики с правильными данными
+  if (imagesFolder.value) {
+    // Переинициализируем загрузчики с правильной папкой
+    const { images: newImages, loadImages: newLoadImages } = useImageLoader(
+      imagesFolder.value
     );
-    if (index !== -1) {
-      currentImageIndex.value = index;
-    }
+    const { plans: newPlans, loadPlans: newLoadPlans } = usePlanLoader(
+      imagesFolder.value
+    );
+
+    // Загружаем изображения и планы
+    newLoadImages();
+    newLoadPlans();
+
+    // Обновляем reactive переменные
+    productImages.value = newImages.value;
+    plans.value = newPlans.value;
+
+    console.log("Планы загружены:", plans.value);
+    console.log("Количество планов:", plans.value.length);
+  } else {
+    // Получаем изображения старым способом
+    productImages.value = getProductImages();
   }
 
   // Обработчики событий для tooltip теперь добавлены через Vue директивы в template
+
+  // Добавляем слушатель клавиатуры
+  document.addEventListener("keydown", handleKeydown);
 });
 
 // Функция перехода к изображению
@@ -847,6 +1247,88 @@ function closeModal() {
   isModalOpen.value = false;
 }
 
+// Функции для модального окна планов
+function openPlanModal() {
+  console.log("openPlanModal вызвана");
+  console.log("plans.value:", plans.value);
+  console.log("plans.value.length:", plans.value.length);
+
+  if (plans.value.length > 0) {
+    isPlanModalOpen.value = true;
+    planModalIndex.value = 0;
+    // Блокируем скролл страницы
+    document.body.style.overflow = "hidden";
+    console.log("Модалка планов открыта");
+  } else {
+    console.log("Нет планов для отображения");
+  }
+}
+
+function closePlanModal() {
+  isPlanModalOpen.value = false;
+  // Восстанавливаем скролл страницы
+  document.body.style.overflow = "auto";
+}
+
+function handlePlanModalClick() {
+  closePlanModal();
+}
+
+// Функции навигации для планов
+function nextPlanImage() {
+  if (plans.value.length > 1) {
+    planModalIndex.value = (planModalIndex.value + 1) % plans.value.length;
+  }
+}
+
+function prevPlanImage() {
+  if (plans.value.length > 1) {
+    planModalIndex.value =
+      planModalIndex.value === 0
+        ? plans.value.length - 1
+        : planModalIndex.value - 1;
+  }
+}
+
+// Обработка клавиатуры для модальных окон
+function handleKeydown(event) {
+  // Обработка модального окна изображений
+  if (isModalOpen.value) {
+    switch (event.key) {
+      case "ArrowLeft":
+        event.preventDefault();
+        prevImage();
+        break;
+      case "ArrowRight":
+        event.preventDefault();
+        nextImage();
+        break;
+      case "Escape":
+        event.preventDefault();
+        closeModal();
+        break;
+    }
+  }
+
+  // Обработка модального окна планов
+  if (isPlanModalOpen.value) {
+    switch (event.key) {
+      case "ArrowLeft":
+        event.preventDefault();
+        prevPlanImage();
+        break;
+      case "ArrowRight":
+        event.preventDefault();
+        nextPlanImage();
+        break;
+      case "Escape":
+        event.preventDefault();
+        closePlanModal();
+        break;
+    }
+  }
+}
+
 // Функция для обработки заказа
 function handleOrder() {
   console.log("handleOrder вызвана");
@@ -863,6 +1345,30 @@ function handleOrder() {
   // Открываем правое меню
   openMenu();
   console.log("openMenu вызвана");
+}
+
+// Функция для обработки изменения планировки
+function handleSwapPlan() {
+  console.log("handleSwapPlan вызвана");
+
+  // Устанавливаем выбранный проект с дополнительным полем для запроса на изменение плана
+  setSelectedProject({
+    title: houseTitle.value || "Название Проекта",
+    price: price.value || "9 700 000 ₽",
+    area: area.value || "203",
+    planChangeRequest: true, // Флаг для отображения дополнительного поля
+  });
+
+  console.log("setSelectedProject для изменения плана выполнен", {
+    title: houseTitle.value,
+    price: price.value,
+    area: area.value,
+    planChangeRequest: true,
+  });
+
+  // Открываем правое меню
+  openMenu();
+  console.log("openMenu для изменения плана вызвана");
 }
 
 // Функция скачивания PDF
@@ -987,11 +1493,18 @@ const handleMouseMove = (event) => {
 
 // Текущее изображение
 const currentImage = computed(() => {
-  return (
+  const image =
     productImages.value[currentImageIndex.value] ||
     houseImg.value ||
-    "/img/1.jpg"
-  );
+    "/img/1.jpg";
+
+  console.log("currentImage computed:", {
+    productImages: productImages.value,
+    currentImageIndex: currentImageIndex.value,
+    selectedImage: image,
+  });
+
+  return image;
 });
 
 // Форматируем цену
@@ -1020,7 +1533,7 @@ useHead({
     {
       name: "keywords",
       content:
-        "заказать каркасный дом, строительство каркасного дома под ключ, каркасный дом цена, стоимость каркасного дома, заказать дом под ключ, строительство каркасных домов в москве, строительство каркасных домов в московской области, каркасно щитовые дома, дома из клееного бруса, каркасник под ключ московская область, стоимость каркасника под ключ, каркасный дом под ключ с ремонтом цена",
+        "строительство каркасных домов, строительство каркасных домов под ключ, строительство каркасного дома цена за м2, стоимость строительства каркасного дома, строительство каркасных домов в москве, строительство каркасных домов в московской области, строительство каркасных домов под ключ цена, каркасный дом под ключ, каркасные дома под ключ московская область, заказать строительство каркасного дома, заказать каркасный дом под ключ, строительство деревянных домов, строительство деревянных домов под ключ, строительство деревянного дома под ключ цена, строительство деревянных домов в московской области, каркасник под ключ, каркасник под ключ московская область, стоимость каркасника под ключ, каркасный дом под ключ с ремонтом цена, каркасные дома, каркасные дома МО, каркасные дома московская область, каркасные дома недорого, каркасные дома для постоянного проживания, каркасные дома в МО под ключ цена, каркасный дом под ключ московская область, каркасные дома под ключ недорого, каркасный дом цена за м2, строительство каркасно щитовых домов, домокомплект каркасного дома, каркасно панельные дома, строительство панельно каркасных домов, строительство каркасно щитовых домов в москвоской области, панельно каркасные дома под ключ цены, каркасно щитовой дом под ключ, каркасно щитовые дома в москве под ключ, щитовые дома, каркасно щитовые дома цена, каркасно щитовые дома, каркасно щитовые дома московская область, заказать дом из клееного бруса, дома из клееного бруса, строительство домов из клеенного бруса, строительство дома из клееного бруса под ключ, дома из клееного бруса под ключ недорого, стоимость дома из клееного бруса, дома из клееного бруса цена за м2",
     },
     {
       property: "og:title",

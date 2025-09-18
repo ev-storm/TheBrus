@@ -27,16 +27,6 @@
               </li>
             </ul>
             <ul>
-              <NuxtLink class="main-link" to="/constructor"
-                >Конструктор</NuxtLink
-              >
-              <li>
-                <NuxtLink class="sub-link" to="/constructor"
-                  >Создать индивидуальный проект</NuxtLink
-                >
-              </li>
-            </ul>
-            <ul>
               <NuxtLink class="main-link" to="/">О компании</NuxtLink>
               <li>
                 <NuxtLink class="sub-link" to="/">Наш подход</NuxtLink>

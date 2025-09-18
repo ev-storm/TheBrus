@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onUnmounted, nextTick, watch } from "vue";
+import { ref, computed, onMounted, onUnmounted, nextTick, watch } from "vue";
 import YandexMap from "~/components/YandexMap.vue";
 import SliderCartProduct from "~/components/SliderCartProduct.vue";
 import FileUpload from "~/components/FileUpload.vue";
@@ -41,7 +41,10 @@ useHead({
 
 // Слайдшоу изображений
 const currentImageIndex = ref(0);
-const images = [
+const isMobile = ref(false);
+
+// Изображения для мобильных устройств
+const mobileImages = [
   "/img/index/title/1.png",
   "/img/index/title/2.png",
   "/img/index/title/3.png",
@@ -50,6 +53,19 @@ const images = [
   "/img/index/title/6.png",
   "/img/index/title/7.png",
 ];
+
+// Изображения для десктопа
+const desktopImages = [
+  "/img/index/title-2/1.png",
+  "/img/index/title-2/2.png",
+  "/img/index/title-2/3.png",
+  "/img/index/title-2/4.png",
+];
+
+// Реактивный массив изображений в зависимости от устройства
+const images = computed(() => {
+  return isMobile.value ? mobileImages : desktopImages;
+});
 
 // Копирование адреса
 const { copyToClipboard } = useCopyToClipboard();
@@ -76,7 +92,19 @@ let slideInterval = null;
 let observer = null;
 
 const nextImage = () => {
-  currentImageIndex.value = (currentImageIndex.value + 1) % images.length;
+  currentImageIndex.value = (currentImageIndex.value + 1) % images.value.length;
+};
+
+// Функция для определения мобильного устройства
+const checkIsMobile = () => {
+  isMobile.value = window.innerWidth <= 768;
+  // Сбрасываем индекс при смене устройства
+  currentImageIndex.value = 0;
+};
+
+// Обработчик изменения размера окна
+const handleResize = () => {
+  checkIsMobile();
 };
 
 // Анимация счетчика
@@ -143,12 +171,19 @@ const setupObserver = () => {
 };
 
 onMounted(() => {
+  // Проверяем устройство при загрузке
+  checkIsMobile();
+
+  // Запускаем слайдшоу
   slideInterval = setInterval(nextImage, 10000); // 10 секунд
 
   // Настраиваем observer для отслеживания видимости b1
   nextTick(() => {
     setupObserver();
   });
+
+  // Добавляем обработчик изменения размера окна
+  window.addEventListener("resize", handleResize);
 });
 
 // Логика формы проекта
@@ -233,6 +268,8 @@ onUnmounted(() => {
   if (observer) {
     observer.disconnect();
   }
+  // Удаляем обработчик изменения размера окна
+  window.removeEventListener("resize", handleResize);
 });
 </script>
 
@@ -288,6 +325,7 @@ onUnmounted(() => {
         </div>
       </div>
     </div>
+    <SliderCartProduct />
     <div class="b3">
       <div class="title-con">
         <div class="h1">
@@ -321,7 +359,7 @@ onUnmounted(() => {
         <Slider />
       </div>
     </div>
-    <SliderCartProduct />
+    <SliderCartPortfolio/>
     <div class="b5">
       <h1>
         Знаете, каким должен быть ваш дом? <br />
@@ -382,9 +420,9 @@ onUnmounted(() => {
       <div class="map-title">
         <h1>Центральный офис</h1>
         <p>
-          <Copy text="Варсонофьевский переулок, 10с2, Москва, 107031" />
+          <Copy text="ул. Ленинская Слобода, 26, стр. 28, Москва" />
 
-          Варсонофьевский переулок, 10с2, Москва, 107031<br />
+          ул. Ленинская Слобода, 26, стр. 28, Москва<br />
           <span>09:00-19:00 Пн-Пт</span>
         </p>
       </div>
@@ -709,6 +747,7 @@ onUnmounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: start;
+  padding: 0 5%;
 }
 .map-title p {
   text-align: end;

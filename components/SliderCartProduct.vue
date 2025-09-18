@@ -141,17 +141,13 @@ const prevSlide = () => {
               :title="product.name"
               :price="product.price"
               :area="product.area"
-              :img1="product.img1"
-              :img2="product.img2"
-              :img3="product.img3"
-              :img4="product.img4"
-              :img5="product.img5"
+              :imagesFolder="product.imagesFolder"
               :sh="product.sh"
               :sh2="product.sh2"
               :sh3="product.sh3"
               :description="product.description"
               :pdf="product.pdf"
-              :cardId="index"
+              :cardId="product.id"
             />
           </div>
         </SwiperSlide>
