@@ -41,25 +41,33 @@ useHead({
 const currentImageIndex = ref(0);
 const isMobile = ref(false);
 
-const mobileImages = [
-  "/img/index/title/1.png",
-  "/img/index/title/2.png",
-  "/img/index/title/3.png",
-  "/img/index/title/4.png",
-  "/img/index/title/5.png",
-  "/img/index/title/6.png",
-  "/img/index/title/7.png",
-];
+// Динамическая загрузка изображений из папок
+const mobileImages = ref([]);
+const desktopImages = ref([]);
 
-const desktopImages = [
-  "/img/index/title-2/1.png",
-  "/img/index/title-2/2.png",
-  "/img/index/title-2/3.png",
-  "/img/index/title-2/4.png",
-];
+// Загружаем изображения при монтировании компонента
+onMounted(async () => {
+  // Загружаем мобильные изображения
+  const mobileModules = import.meta.glob(
+    "/public/img/index/title/*.{png,jpg,jpeg,webp}",
+    { eager: true }
+  );
+  mobileImages.value = Object.keys(mobileModules)
+    .map((path) => path.replace("/public", ""))
+    .sort();
+
+  // Загружаем десктопные изображения
+  const desktopModules = import.meta.glob(
+    "/public/img/index/title-2/*.{png,jpg,jpeg,webp}",
+    { eager: true }
+  );
+  desktopImages.value = Object.keys(desktopModules)
+    .map((path) => path.replace("/public", ""))
+    .sort();
+});
 
 const images = computed(() => {
-  return isMobile.value ? mobileImages : desktopImages;
+  return isMobile.value ? mobileImages.value : desktopImages.value;
 });
 
 const { copyToClipboard } = useCopyToClipboard();
