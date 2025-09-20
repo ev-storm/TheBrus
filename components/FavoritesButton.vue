@@ -31,9 +31,6 @@ const isLiked = computed(() => isFavorite(props.cardId));
 
 // Обработчик клика по лайку
 const handleLikeClick = () => {
-  console.log("FavoritesButton clicked for cardId:", props.cardId);
-  console.log("Current favorites before toggle:", favorites.value);
   toggleFavorite(props.cardId);
-  console.log("Current favorites after toggle:", favorites.value);
 };
 </script>

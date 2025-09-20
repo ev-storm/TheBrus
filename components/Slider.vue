@@ -19,9 +19,19 @@
       @mouseenter="onSlideHover(index)"
       @mouseleave="onSlideLeave"
     >
-      <img class="slide-img" :src="slide.img" :alt="slide.text" />
+      <NuxtImg
+        class="slide-img"
+        :src="slide.img"
+        :alt="slide.text"
+        loading="lazy"
+        quality="85"
+      />
       <div class="slide-text-con">
-        <img :src="slide.imgText" alt="" />
+        <NuxtImg
+          :src="slide.imgText"
+          :alt="slide.text + ' текст'"
+          loading="lazy"
+        />
         <span>{{ slide.text }}</span>
       </div>
     </swiper-slide>
@@ -134,15 +144,6 @@ export default {
         return;
       }
 
-      console.log(
-        "Hover on slide:",
-        index,
-        "First visible:",
-        firstVisibleIndex.value,
-        "Last visible:",
-        lastVisibleIndex.value
-      );
-
       // Очищаем предыдущий таймер, если он есть
       if (hoverTimeout) {
         clearTimeout(hoverTimeout);
@@ -153,11 +154,9 @@ export default {
         if (swiperInstance.value) {
           if (index === firstVisibleIndex.value) {
             // При наведении на первый видимый слайд - идем влево
-            console.log("Going left");
             swiperInstance.value.slidePrev();
           } else if (index === lastVisibleIndex.value) {
             // При наведении на последний видимый слайд - идем вправо
-            console.log("Going right");
             swiperInstance.value.slideNext();
           }
         }

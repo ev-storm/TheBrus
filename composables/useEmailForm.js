@@ -26,7 +26,6 @@ export const useEmailForm = () => {
           emailData.attachment = fileData.selectedFile.name;
           emailData.attachmentData = base64Data;
         } catch (fileError) {
-          console.error("Ошибка обработки файла:", fileError);
           error.value = "Ошибка обработки файла";
           isLoading.value = false;
           return;
@@ -40,12 +39,10 @@ export const useEmailForm = () => {
 
       if (response.success) {
         success.value = true;
-        console.log("Письмо отправлено успешно:", response.messageId);
       } else {
         error.value = response.error || "Ошибка отправки письма";
       }
     } catch (err) {
-      console.error("Ошибка отправки:", err);
       error.value = "Произошла ошибка при отправке письма";
     } finally {
       isLoading.value = false;

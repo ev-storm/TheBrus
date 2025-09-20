@@ -18,11 +18,13 @@
         ></div>
 
         <!-- Изображение -->
-        <img
+        <NuxtImg
           v-if="images[currentIndex]"
           :src="images[currentIndex]"
           :alt="alt"
           class="modal-image"
+          loading="lazy"
+          quality="90"
         />
 
         <!-- Стрелки навигации -->

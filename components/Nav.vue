@@ -8,20 +8,29 @@
       }
     "
   >
-    <img src="/public/svg/button/phone.svg" alt="" />
+    <NuxtImg src="/svg/button/phone.svg" alt="Телефон" loading="lazy" />
   </button>
   <nav class="nav" :class="{ scrolled: isScrolled }">
     <div class="nav-container">
       <div class="nav-logo" @click="goToHome">
-        <img src="/svg/logo/logo-nav.svg" alt="TheBrus" class="logo" />
+        <NuxtImg
+          src="/svg/logo/logo-nav.svg"
+          alt="TheBrus"
+          class="logo"
+          loading="eager"
+          preload
+        />
       </div>
       <div class="nav-button">
-        <img
+        <button class="btn nav-button-menu" @click.stop="toggleMenu">
+          МЕНЮ
+        </button>
+        <!-- <img
           class="nav-menu-button"
           src="/svg/button/nav/1.svg"
           alt=""
           @click.stop="toggleMenu"
-        />
+        /> -->
         <button
           class="btn trigger trigger-pc"
           @click="
@@ -31,7 +40,7 @@
             }
           "
         >
-          Написать
+          <NuxtImg src="/svg/button/mail-nav.svg" alt="Email" loading="lazy" />
         </button>
       </div>
     </div>
@@ -139,10 +148,28 @@ onUnmounted(() => {
   transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
   will-change: backdrop-filter;
 }
-
+.nav-button button {
+  padding: 6px;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 4vh;
+  font-weight: 500;
+}
+.nav-button-menu {
+  padding: 6px 60px !important;
+}
+.nav-button {
+  gap: 15px;
+}
+.trigger-pc img {
+  margin: 0 !important;
+}
 .nav.scrolled {
   backdrop-filter: blur(0px);
   background: rgba(255, 255, 255, 0);
+  padding: 0 !important;
 }
 
 .nav-container {
@@ -198,7 +225,10 @@ onUnmounted(() => {
 }
 @media (max-width: 768px) {
   .trigger-pc {
-    display: none;
+    display: none !important;
+  }
+  .nav-button button {
+    padding: 0 10vw !important;
   }
   .call {
     display: flex;

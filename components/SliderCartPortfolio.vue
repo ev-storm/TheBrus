@@ -78,7 +78,9 @@ const prevSlide = () => {
 <template>
   <div class="slider-cart-con">
     <div class="slider-title">
-      <h1>Наши выполненые проекты</h1>
+      <NuxtLink to="/portfolio?tab=portfolio" data-v-16b53fac=""
+        ><h1>Наши выполненые проекты</h1></NuxtLink
+      >
       <div class="slider-btn">
         <button @click="prevSlide" class="nav-btn">
           <svg

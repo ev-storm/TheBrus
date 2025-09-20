@@ -11,7 +11,7 @@
   --fs-0: clamp(32px, 5vw, 72px);
   --fs-1: clamp(24px, 4vw, 48px);
   --fs-2: clamp(18px, 3vw, 36px);
-  --fs-p: clamp(14px, 1vw, 18px);
+  --fs-p: clamp(14px, 1.5vw, 21px);
 
   /* fonts */
   --font-primary: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI",

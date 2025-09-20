@@ -1,9 +1,9 @@
 <template>
   <div class="soc">
-    <img src="/svg/button/soc/white/wt.svg" alt="WhatsApp" />
-    <img src="/svg/button/soc/white/tg.svg" alt="Telegram" />
-    <img src="/svg/button/soc/white/mail.svg" alt="Email" />
-    <img src="/svg/button/soc/white/max.svg" alt="Max" />
+    <NuxtImg src="/svg/button/soc/white/wt.svg" alt="WhatsApp" loading="lazy" />
+    <NuxtImg src="/svg/button/soc/white/tg.svg" alt="Telegram" loading="lazy" />
+    <NuxtImg src="/svg/button/soc/white/mail.svg" alt="Email" loading="lazy" />
+    <NuxtImg src="/svg/button/soc/white/max.svg" alt="Max" loading="lazy" />
   </div>
 </template>
 

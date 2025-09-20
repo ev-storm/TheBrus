@@ -10,7 +10,19 @@
           readonly
         />
       </div>
-      <div class="form-field" v-if="selectedProject">
+      <div class="form-field" v-if="selectedProject?.referralProgram">
+        <input
+          v-model="form.referralProgram"
+          type="text"
+          placeholder="Реферальная программа"
+          class="form-input project-input referral-program-input"
+          readonly
+        />
+      </div>
+      <div
+        class="form-field"
+        v-if="selectedProject && !selectedProject.referralProgram"
+      >
         <input
           v-model="form.projectName"
           type="text"
@@ -78,32 +90,27 @@ const form = ref({
   phone: "",
   projectName: "",
   planChangeRequest: "",
+  referralProgram: "",
 });
 
 const isPolicyAccepted = ref(false);
 
 const togglePolicy = () => {
-  console.log(
-    "FormNav togglePolicy called, current value:",
-    isPolicyAccepted.value
-  );
   isPolicyAccepted.value = !isPolicyAccepted.value;
-  console.log("FormNav togglePolicy new value:", isPolicyAccepted.value);
 };
 
-// Баннер уведомлений
 const showBanner = ref(false);
 const bannerMessage = ref("");
 const bannerType = ref("success");
 
-// Отслеживаем изменения error и success
 watch([error, success], ([newError, newSuccess]) => {
   if (newError) {
     bannerMessage.value = newError;
     bannerType.value = "error";
     showBanner.value = true;
   } else if (newSuccess) {
-    bannerMessage.value = "Заявка отправлена успешно!";
+    bannerMessage.value =
+      "<h3>Получили ваше обращение!</h3><span>Мы в офисе уже боремся, кому из менеждеров повезет пообщаться с таким замечательным человеком</span>";
     bannerType.value = "success";
     showBanner.value = true;
   }
@@ -111,16 +118,13 @@ watch([error, success], ([newError, newSuccess]) => {
 
 const handleSubmit = async () => {
   if (!isPolicyAccepted.value) {
-    console.log("Policy not accepted");
     return;
   }
 
-  // Подготовка данных для отправки
   let message = selectedProject.value
     ? `Клиент заинтересован в проекте "${selectedProject.value.title}" и хочет получить консультацию.`
     : "Клиент оставил заявку на обратную связь.";
 
-  // Если это запрос на изменение плана, добавляем соответствующую информацию
   if (
     selectedProject.value?.planChangeRequest &&
     form.value.planChangeRequest
@@ -128,26 +132,31 @@ const handleSubmit = async () => {
     message += `\n\nЗапрос на изменение плана: ${form.value.planChangeRequest}`;
   }
 
+  if (selectedProject.value?.referralProgram && form.value.referralProgram) {
+    message += `\n\nИнтерес к реферальной программе: ${form.value.referralProgram}`;
+  }
+
   const emailData = {
     name: form.value.name,
     phone: form.value.phone,
     message: message,
-    email: "", // Нет email поля в форме
+    email: "",
     formType: selectedProject.value?.planChangeRequest
       ? "plan_change"
-      : "feedback", // Тип формы для темы письма
+      : selectedProject.value?.referralProgram
+      ? "referral_program"
+      : "feedback",
   };
 
-  // Отправка письма
   await sendEmail(emailData);
 
-  // Сброс формы при успешной отправке
   if (success.value) {
     form.value = {
       name: "",
       phone: "",
       projectName: "",
       planChangeRequest: "",
+      referralProgram: "",
     };
     isPolicyAccepted.value = false;
   }

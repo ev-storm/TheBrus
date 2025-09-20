@@ -1054,17 +1054,12 @@ const { openMenu } = useMenu("right");
 
 // Получаем данные конкретного продукта
 const getProductData = () => {
-  console.log("getProductData вызвана с productId:", productId.value);
-  console.log("productsData:", productsData);
-  console.log("portfolioData:", portfolioData);
-
   // Если передан ID, ищем продукт по ID в обоих массивах
   if (productId.value) {
     // Сначала ищем в products
     if (productsData && Array.isArray(productsData)) {
       let product = productsData.find((p) => p && p.id === productId.value);
       if (product) {
-        console.log("Найден продукт в products:", product);
         return product;
       }
     }
@@ -1073,12 +1068,9 @@ const getProductData = () => {
     if (portfolioData && Array.isArray(portfolioData)) {
       let product = portfolioData.find((p) => p && p.id === productId.value);
       if (product) {
-        console.log("Найден продукт в portfolio:", product);
         return product;
       }
     }
-
-    console.log("Продукт не найден ни в products, ни в portfolio");
   }
 
   // Fallback: ищем по imagesFolder (обратная совместимость)
@@ -1159,11 +1151,6 @@ const getProductImages = () => {
 
 // Инициализируем данные
 onMounted(() => {
-  console.log("onMounted вызван");
-  console.log("productId.value:", productId.value);
-  console.log("productsData в onMounted:", productsData);
-  console.log("portfolioData в onMounted:", portfolioData);
-
   // Получаем данные продукта
   productData.value = getProductData();
 
@@ -1200,9 +1187,6 @@ onMounted(() => {
     // Обновляем reactive переменные
     productImages.value = newImages.value;
     plans.value = newPlans.value;
-
-    console.log("Планы загружены:", plans.value);
-    console.log("Количество планов:", plans.value.length);
   } else {
     // Получаем изображения старым способом
     productImages.value = getProductImages();
@@ -1249,18 +1233,12 @@ function closeModal() {
 
 // Функции для модального окна планов
 function openPlanModal() {
-  console.log("openPlanModal вызвана");
-  console.log("plans.value:", plans.value);
-  console.log("plans.value.length:", plans.value.length);
-
   if (plans.value.length > 0) {
     isPlanModalOpen.value = true;
     planModalIndex.value = 0;
     // Блокируем скролл страницы
     document.body.style.overflow = "hidden";
-    console.log("Модалка планов открыта");
   } else {
-    console.log("Нет планов для отображения");
   }
 }
 
@@ -1331,8 +1309,6 @@ function handleKeydown(event) {
 
 // Функция для обработки заказа
 function handleOrder() {
-  console.log("handleOrder вызвана");
-
   // Устанавливаем выбранный проект
   setSelectedProject({
     title: houseTitle.value || "Название Проекта",
@@ -1340,35 +1316,22 @@ function handleOrder() {
     area: area.value || "203",
   });
 
-  console.log("setSelectedProject выполнен");
-
   // Открываем правое меню
   openMenu();
-  console.log("openMenu вызвана");
 }
 
 // Функция для обработки изменения планировки
 function handleSwapPlan() {
-  console.log("handleSwapPlan вызвана");
-
   // Устанавливаем выбранный проект с дополнительным полем для запроса на изменение плана
   setSelectedProject({
     title: houseTitle.value || "Название Проекта",
     price: price.value || "9 700 000 ₽",
     area: area.value || "203",
-    planChangeRequest: true, // Флаг для отображения дополнительного поля
-  });
-
-  console.log("setSelectedProject для изменения плана выполнен", {
-    title: houseTitle.value,
-    price: price.value,
-    area: area.value,
     planChangeRequest: true,
   });
 
   // Открываем правое меню
   openMenu();
-  console.log("openMenu для изменения плана вызвана");
 }
 
 // Функция скачивания PDF
@@ -1391,7 +1354,6 @@ const downloadPDF = () => {
 const tooltip = ref(null);
 
 const showTooltip = (event, text) => {
-  console.log("showTooltip вызвана с текстом:", text);
   if (!text) return;
 
   // Удаляем существующий tooltip
@@ -1417,7 +1379,6 @@ const showTooltip = (event, text) => {
   tooltip.value.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.3)";
 
   document.body.appendChild(tooltip.value);
-  console.log("Tooltip создан и добавлен в DOM");
 
   // Позиционируем tooltip рядом с курсором
   setTimeout(() => {
@@ -1440,7 +1401,6 @@ const showTooltip = (event, text) => {
       tooltip.value.style.left = left + "px";
       tooltip.value.style.top = top + "px";
       tooltip.value.style.opacity = "1";
-      console.log("Tooltip показан рядом с курсором");
     }
   }, 10);
 };
@@ -1453,19 +1413,15 @@ const hideTooltip = () => {
 };
 
 const handleMouseEnter = (event) => {
-  console.log("Mouse enter на элемент:", event.target.textContent);
   const text = event.target.getAttribute("data");
-  console.log("Data атрибут:", text);
 
   if (text) {
     showTooltip(event, text);
   } else {
-    console.log("Нет data атрибута у элемента");
   }
 };
 
 const handleMouseLeave = () => {
-  console.log("Mouse leave");
   hideTooltip();
 };
 
@@ -1497,12 +1453,6 @@ const currentImage = computed(() => {
     productImages.value[currentImageIndex.value] ||
     houseImg.value ||
     "/img/1.jpg";
-
-  console.log("currentImage computed:", {
-    productImages: productImages.value,
-    currentImageIndex: currentImageIndex.value,
-    selectedImage: image,
-  });
 
   return image;
 });

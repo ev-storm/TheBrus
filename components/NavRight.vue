@@ -11,14 +11,16 @@
     <div class="nav-right-container">
       <div class="nav-right-content">
         <div class="nav-top-menu">
-          <h3>+7 910 989-26-79</h3>
+          <h3>+7 915 178-76-11</h3>
           <Network />
         </div>
         <div class="nav-right-menu">
           <!-- <h1>Обратная<br />связь</h1> -->
           <FormNav />
         </div>
-        <div class="nav-right-footer"></div>
+        <div class="nav-right-footer">
+          <a href="tel:+79151787611" class="btn btn-call">Позвонить</a>
+        </div>
       </div>
     </div>
   </div>
@@ -79,24 +81,19 @@ const handleTouchEnd = (event) => {
   isSwipeStarted.value = false;
 };
 
-// Очищаем выбранный проект при закрытии меню
 watch(isOpen, (newValue) => {
   if (!newValue) {
     clearSelectedProject();
   }
 });
 
-// Синхронизируем состояние с глобальным менеджером
 watch(rightMenuOpen, (newValue) => {
   if (!newValue && isOpen.value) {
-    // Если глобальное состояние закрыто, но локальное открыто - закрываем локальное
     isOpen.value = false;
   }
 });
 
-// Слушаем события для открытия/закрытия меню
 const handleToggleRightMenu = (event) => {
-  console.log("NavRight получил событие:", event.detail);
   isOpen.value = event.detail.isOpen;
 };
 
@@ -177,6 +174,9 @@ onUnmounted(() => {
   flex-direction: column;
   justify-content: flex-end;
 }
+.btn-call {
+  display: none;
+}
 @media (max-width: 768px) {
   .nav-right-container[data-v-9872edf8] {
     padding: 50px 20px;
@@ -185,6 +185,11 @@ onUnmounted(() => {
     padding: 5px 20px;
 
     font-size: 16px;
+  }
+  .btn-call {
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 }
 </style>

@@ -278,7 +278,11 @@ function handleOrder() {
         <div class="hover-zone right" @mouseenter="handleEnter(2)"></div>
       </div>
       <div class="badge">
-        <img src="/svg/logo/logo.svg" alt="logo" />
+        <NuxtImg
+          src="/svg/logo/logo.svg"
+          alt="TheBrus логотип"
+          loading="lazy"
+        />
       </div>
       <div class="dots" v-if="imagesList.length > 1">
         <span
@@ -395,11 +399,13 @@ function handleOrder() {
         ></div>
 
         <!-- Изображение -->
-        <img
+        <NuxtImg
           v-if="modalImages[modalImageIndex]"
           :src="modalImages[modalImageIndex]"
           :alt="title"
           class="modal-image"
+          loading="lazy"
+          quality="90"
         />
 
         <!-- Стрелки навигации -->
@@ -466,11 +472,13 @@ function handleOrder() {
         ></div>
 
         <!-- Изображение плана -->
-        <img
+        <NuxtImg
           v-if="planImages[planModalIndex]"
           :src="planImages[planModalIndex]"
           :alt="title + ' - План'"
           class="modal-image"
+          loading="lazy"
+          quality="90"
         />
 
         <!-- Стрелки навигации -->
@@ -627,8 +635,8 @@ function handleOrder() {
 }
 .price {
   color: #65c36c;
-
-  font-size: clamp(16px, 2vw, 28px);
+  font-weight: 600;
+  font-size: var(--fs-p);
 }
 .actions .btn {
   font-size: clamp(10px, 1vw, 15px);
@@ -849,7 +857,7 @@ function handleOrder() {
   }
 
   .area {
-    font-size: 16px;
+    font-size: var(--fs-p);
     color: #9f9f9f;
   }
 

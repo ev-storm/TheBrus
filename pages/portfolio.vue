@@ -37,9 +37,6 @@ import portfolioData from "~/data/portfoli.js";
 const products = ref(productsData);
 const portfolio = ref(portfolioData);
 
-console.log("Products loaded:", products.value?.length || 0);
-console.log("Portfolio loaded:", portfolio.value?.length || 0);
-
 // Используем useState для SSR-совместимого состояния
 const activeTab = useState("portfolio-activeTab", () => "order");
 const sortBy = useState("portfolio-sortBy", () => null);
@@ -57,6 +54,14 @@ onMounted(() => {
       activeTab.value = "order";
     }
   }
+
+  // Валидация избранного при загрузке страницы
+  const allIds = [
+    ...products.value.map((item) => item.id),
+    ...portfolio.value.map((item) => item.id),
+  ].filter((id) => id); // Убираем undefined/null ID
+
+  validateFavorites(allIds);
 });
 
 // Отслеживаем изменения route для обновления activeTab
@@ -72,13 +77,18 @@ watch(
 );
 
 // Функциональность избранного
-const { isFavorite } = useFavorites();
+const { isFavorite, validateFavorites } = useFavorites();
+
+// Правое меню
+const { openRightMenu: openRightMenuManager } = useMenuManager();
+
+// Выбранный проект
+const { setSelectedProject } = useSelectedProject();
 
 // Функциональность для работы с ID карточек
 const { getCardId } = useCardId();
 
 const items = computed(() => {
-  console.log("items computed вызвана");
   let data =
     (activeTab.value === "order" ? products.value : portfolio.value) || [];
 
@@ -178,7 +188,21 @@ function sortByArea() {
         </h1>
         <div>
           <p>Выгодные условия для пришедших по совету друзей и знакомых</p>
-          <button class="btn">Подробней о реферальной программе</button>
+          <button
+            class="btn trigger"
+            @click="
+              (event) => {
+                event.stopPropagation();
+                setSelectedProject({
+                  title: 'Реферальная программа',
+                  referralProgram: true,
+                });
+                openRightMenuManager();
+              }
+            "
+          >
+            Подробней о реферальной программе
+          </button>
         </div>
       </div>
     </div>
@@ -339,6 +363,7 @@ function sortByArea() {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 0;
 }
 .catalog-btn .btn {
   background: transparent;
@@ -384,6 +409,7 @@ function sortByArea() {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 70px 24px;
+  padding: 0;
 }
 .filter-item span {
   font-size: 15px;
@@ -391,7 +417,15 @@ function sortByArea() {
   color: var(--green);
   font-weight: 500;
 }
-@media (max-width: 1100px) {
+@media (max-width: 1700px) {
+  .catalog-con {
+    padding: 0 5%;
+  }
+  .catalog-btn-con {
+    padding: 0 5%;
+  }
+}
+@media (max-width: 1500px) {
   .catalog-con {
     grid-template-columns: repeat(2, 1fr);
   }

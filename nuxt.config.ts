@@ -2,6 +2,7 @@
 export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   devtools: { enabled: false },
+  modules: ["@nuxt/image"],
   css: ["~/assets/css/fonts.css", "~/assets/css/main.css"],
   runtimeConfig: {
     ymapsApiKey:
@@ -9,6 +10,34 @@ export default defineNuxtConfig({
     public: {
       ymapsApiKey:
         process.env.YMAPS_API_KEY || "2daa9fb2-779c-4369-b15e-8ba3c97897c5",
+    },
+  },
+  image: {
+    // Оптимизация изображений
+    quality: 80,
+    format: ["webp", "avif", "jpeg", "png"],
+    screens: {
+      xs: 320,
+      sm: 640,
+      md: 768,
+      lg: 1024,
+      xl: 1280,
+      xxl: 1536,
+    },
+    densities: [1, 2],
+    // Lazy loading по умолчанию
+    loading: "lazy",
+    // Предзагрузка критических изображений
+    preload: false,
+    // Кэширование
+    cache: true,
+    // Оптимизация для продакшена
+    domains: ["thebrus.ru"],
+    // Провайдер для локальных изображений
+    providers: {
+      local: {
+        provider: "ipx",
+      },
     },
   },
   app: {

@@ -8,7 +8,7 @@
     }"
   >
     <div class="banner-content">
-      <h1 class="banner-title">{{ message }}</h1>
+      <div class="banner-title" v-html="message"></div>
 
       <button class="banner-close" @click="closeBanner" :disabled="isClosing">
         <span v-if="duration === 0" class="banner-ok-text">ОК</span>
@@ -44,7 +44,6 @@
 </template>
 
 <script setup>
-// v2.0 - Упрощенная версия без обратного отсчета
 import { ref, computed, onMounted, onUnmounted } from "vue";
 
 const props = defineProps({
@@ -67,15 +66,12 @@ const emit = defineEmits(["close"]);
 const isVisible = ref(false);
 const isClosing = ref(false);
 
-// Переменные для прогресс-круга
 const startTime = ref(0);
 const progressOffset = ref(0);
 const intervalId = ref(null);
 
-// Вычисляемые свойства
 const circumference = computed(() => 2 * Math.PI * 18); // радиус 18
 
-// Функция обновления прогресса
 const updateProgress = () => {
   if (!startTime.value) return;
 
@@ -83,20 +79,17 @@ const updateProgress = () => {
   const progress = Math.min(elapsed / (props.duration * 1000), 1);
   progressOffset.value = circumference.value * (1 - progress);
 
-  // Останавливаем когда прогресс завершен
   if (progress >= 1) {
     stopProgress();
   }
 };
 
-// Функция запуска прогресса
 const startProgress = () => {
   if (props.duration <= 0) return;
 
   startTime.value = Date.now();
   progressOffset.value = circumference.value;
 
-  // Используем requestAnimationFrame для более плавной анимации
   const animate = () => {
     updateProgress();
     if (intervalId.value) {
@@ -107,7 +100,6 @@ const startProgress = () => {
   intervalId.value = requestAnimationFrame(animate);
 };
 
-// Функция остановки прогресса
 const stopProgress = () => {
   if (intervalId.value) {
     cancelAnimationFrame(intervalId.value);
@@ -121,7 +113,6 @@ const closeBanner = () => {
   isClosing.value = true;
   stopProgress();
 
-  // Анимация закрытия
   setTimeout(() => {
     isVisible.value = false;
     emit("close");
@@ -129,18 +120,15 @@ const closeBanner = () => {
 };
 
 onMounted(() => {
-  // Плавное появление баннера
   setTimeout(() => {
     isVisible.value = true;
   }, 50);
 
-  // Запускаем прогресс сразу, но с небольшой задержкой для появления
   if (props.duration > 0) {
     setTimeout(() => {
       startProgress();
     }, 100); // Небольшая задержка для плавного появления
 
-    // Автозакрытие через указанное время
     setTimeout(() => {
       closeBanner();
     }, props.duration * 1000);
@@ -161,8 +149,8 @@ onUnmounted(() => {
   width: fit-content;
   min-width: 200px;
   max-width: 700px;
-  height: 5vh;
-  min-height: 50px;
+  height: fit-content;
+  min-height: 5vh;
   background: var(--green);
   border-radius: 0px;
   z-index: 1000;
@@ -210,6 +198,16 @@ onUnmounted(() => {
   flex: 1;
   line-height: 1.3;
   padding-right: 20px;
+}
+.banner-title h3 {
+  margin: 0;
+  display: inline;
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+.banner-title span {
+  opacity: 0.5 !important;
 }
 
 .banner-close {

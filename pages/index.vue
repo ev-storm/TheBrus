@@ -11,7 +11,6 @@ import { useCopyToClipboard } from "~/composables/useCopyToClipboard";
 import { useMenu } from "~/composables/useMenu";
 import { useMenuManager } from "~/composables/useMenuManager";
 
-// Главная страница
 useHead({
   title: "TheBrus - Строительство каркасных домов под ключ в Москве и МО",
   meta: [
@@ -39,11 +38,9 @@ useHead({
   ],
 });
 
-// Слайдшоу изображений
 const currentImageIndex = ref(0);
 const isMobile = ref(false);
 
-// Изображения для мобильных устройств
 const mobileImages = [
   "/img/index/title/1.png",
   "/img/index/title/2.png",
@@ -54,7 +51,6 @@ const mobileImages = [
   "/img/index/title/7.png",
 ];
 
-// Изображения для десктопа
 const desktopImages = [
   "/img/index/title-2/1.png",
   "/img/index/title-2/2.png",
@@ -62,17 +58,14 @@ const desktopImages = [
   "/img/index/title-2/4.png",
 ];
 
-// Реактивный массив изображений в зависимости от устройства
 const images = computed(() => {
   return isMobile.value ? mobileImages : desktopImages;
 });
 
-// Копирование адреса
 const { copyToClipboard } = useCopyToClipboard();
 const showBanner = ref(false);
 const addressText = "Варсонофьевский переулок, 10с2, Москва, 107031";
 
-// Правое меню
 const { openMenu: openRightMenu } = useMenu("right");
 const { openRightMenu: openRightMenuManager } = useMenuManager();
 
@@ -83,7 +76,6 @@ const handleCopyAddress = async () => {
   }
 };
 
-// Анимация баннера календаря
 const isBannerVisible = ref(false);
 const counterValue = ref(200);
 const b1Element = ref(null);
@@ -95,19 +87,16 @@ const nextImage = () => {
   currentImageIndex.value = (currentImageIndex.value + 1) % images.value.length;
 };
 
-// Функция для определения мобильного устройства
 const checkIsMobile = () => {
   isMobile.value = window.innerWidth <= 768;
-  // Сбрасываем индекс при смене устройства
+
   currentImageIndex.value = 0;
 };
 
-// Обработчик изменения размера окна
 const handleResize = () => {
   checkIsMobile();
 };
 
-// Анимация счетчика
 const animateCounter = () => {
   const startValue = 200;
   const endValue = 70;
@@ -118,7 +107,6 @@ const animateCounter = () => {
     const elapsed = Date.now() - startTime;
     const progress = Math.min(elapsed / duration, 1);
 
-    // Easing function для плавной анимации
     const easeOutCubic = 1 - Math.pow(1 - progress, 3);
     counterValue.value = Math.round(
       startValue - (startValue - endValue) * easeOutCubic
@@ -132,13 +120,11 @@ const animateCounter = () => {
   requestAnimationFrame(updateCounter);
 };
 
-// Сброс баннера и счетчика
 const resetBanner = () => {
   isBannerVisible.value = false;
   counterValue.value = 200;
 };
 
-// Настройка Intersection Observer
 const setupObserver = () => {
   if (!b1Element.value) return;
 
@@ -146,15 +132,12 @@ const setupObserver = () => {
     (entries) => {
       entries.forEach((entry) => {
         if (!entry.isIntersecting) {
-          // Элемент вышел за пределы экрана
           resetBanner();
         } else {
-          // Элемент попал в область экрана
           if (!isBannerVisible.value) {
-            // Запускаем анимацию баннера через 2 секунды
             setTimeout(() => {
               isBannerVisible.value = true;
-              // Запускаем анимацию счетчика с небольшой задержкой
+
               setTimeout(animateCounter, 500);
             }, 1000);
           }
@@ -171,22 +154,17 @@ const setupObserver = () => {
 };
 
 onMounted(() => {
-  // Проверяем устройство при загрузке
   checkIsMobile();
 
-  // Запускаем слайдшоу
   slideInterval = setInterval(nextImage, 10000); // 10 секунд
 
-  // Настраиваем observer для отслеживания видимости b1
   nextTick(() => {
     setupObserver();
   });
 
-  // Добавляем обработчик изменения размера окна
   window.addEventListener("resize", handleResize);
 });
 
-// Логика формы проекта
 const { sendEmail, isLoading, error, success } = useEmailForm();
 
 const projectForm = ref({
@@ -198,26 +176,23 @@ const projectForm = ref({
 const isPolicyAccepted = ref(false);
 
 const togglePolicy = () => {
-  console.log("togglePolicy called, current value:", isPolicyAccepted.value);
   isPolicyAccepted.value = !isPolicyAccepted.value;
-  console.log("togglePolicy new value:", isPolicyAccepted.value);
 };
 
 const fileUpload = ref(null);
 
-// Баннер уведомлений формы
 const showFormBanner = ref(false);
 const formBannerMessage = ref("");
 const formBannerType = ref("success");
 
-// Отслеживаем изменения error и success
 watch([error, success], ([newError, newSuccess]) => {
   if (newError) {
     formBannerMessage.value = newError;
     formBannerType.value = "error";
     showFormBanner.value = true;
   } else if (newSuccess) {
-    formBannerMessage.value = "Заявка отправлена успешно!";
+    formBannerMessage.value =
+      "<h3>Получили ваше обращение!</h3><span>Мы в офисе уже боремся, кому из менеждеров повезет пообщаться с таким замечательным человеком</span>";
     formBannerType.value = "success";
     showFormBanner.value = true;
   }
@@ -225,7 +200,6 @@ watch([error, success], ([newError, newSuccess]) => {
 
 const handleProjectSubmit = async () => {
   if (!isPolicyAccepted.value) {
-    console.log("Policy not accepted");
     return;
   }
 
@@ -237,7 +211,6 @@ const handleProjectSubmit = async () => {
     formType: "project", // Тип формы для темы письма
   };
 
-  // Получаем данные файла если есть
   const fileData =
     fileUpload.value && fileUpload.value.selectedFile
       ? {
@@ -248,7 +221,6 @@ const handleProjectSubmit = async () => {
 
   await sendEmail(emailData, fileData);
 
-  // Сброс формы при успешной отправке
   if (success.value) {
     projectForm.value = {
       name: "",
@@ -268,7 +240,7 @@ onUnmounted(() => {
   if (observer) {
     observer.disconnect();
   }
-  // Удаляем обработчик изменения размера окна
+
   window.removeEventListener("resize", handleResize);
 });
 </script>
@@ -297,7 +269,7 @@ onUnmounted(() => {
             }
           "
         >
-          Присоедениться
+          Присоединиться
         </button>
       </div>
       <div class="banner-calendar" :class="{ visible: isBannerVisible }">
@@ -315,13 +287,28 @@ onUnmounted(() => {
       <div class="b2-text-con">
         <div class="b2-text">
           <p>
-            Более <span>3 проектов</span> по всей стране. <br />Сопровождение
+            Более <span>50 проектов</span> по всей стране. <br />Сопровождение
             проекта мечты от идеи до реализации.
           </p>
-          <button class="btn">Сделать шаг к мечте</button>
+          <button
+            class="btn trigger"
+            @click="
+              (event) => {
+                event.stopPropagation();
+                openRightMenuManager();
+              }
+            "
+          >
+            Сделать шаг к мечте
+          </button>
         </div>
         <div class="b2-img">
-          <img src="/img/index/1.png" alt="" />
+          <NuxtImg
+            src="/img/index/1.png"
+            alt="Главное изображение"
+            loading="lazy"
+            quality="85"
+          />
         </div>
       </div>
     </div>
@@ -329,7 +316,7 @@ onUnmounted(() => {
     <div class="b3">
       <div class="title-con">
         <div class="h1">
-          <img src="/img/index/3.svg" alt="" />
+          <img src="/img/index/3.svg" alt="Логотип" />
         </div>
         <p>
           — современная технологичная компания с 5-летним опытом работы на рынке
@@ -343,10 +330,15 @@ onUnmounted(() => {
           работе на следующий же день после подписания договора.
         </p>
       </div>
-      <img class="b3-back" src="/img/index/2.svg" alt="" />
+      <NuxtImg
+        class="b3-back"
+        src="/img/index/2.svg"
+        alt="Фоновая графика"
+        loading="lazy"
+      />
     </div>
     <div class="b4">
-      <div class="b4-title">
+      <div class="b4-title" id="about-index">
         <h1>Наш подход</h1>
       </div>
       <p>
@@ -359,7 +351,7 @@ onUnmounted(() => {
         <Slider />
       </div>
     </div>
-    <SliderCartPortfolio/>
+    <SliderCartPortfolio />
     <div class="b5">
       <h1>
         Знаете, каким должен быть ваш дом? <br />
@@ -412,7 +404,12 @@ onUnmounted(() => {
           </form>
         </div>
         <div class="b5-img">
-          <img src="/img/index/5.png" alt="" />
+          <NuxtImg
+            src="/img/index/5.png"
+            alt="Изображение секции"
+            loading="lazy"
+            quality="85"
+          />
         </div>
       </div>
     </div>
@@ -506,6 +503,7 @@ onUnmounted(() => {
   justify-content: space-evenly;
   box-shadow: 0 0 50px #000;
   transition: right 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  padding: 0 3%;
 }
 
 .banner-calendar.visible {
@@ -513,7 +511,8 @@ onUnmounted(() => {
 }
 .banner-calendar p {
   color: #fff;
-  font-weight: 500;
+  font-weight: 400;
+  line-height: 1;
 }
 
 .score {
@@ -597,6 +596,7 @@ onUnmounted(() => {
 .b2-text p {
   font-weight: 400;
   margin: 20% 0;
+  font-size: clamp(18px, 2vw, 30px);
 }
 .b2-text p span {
   color: var(--green);
@@ -783,7 +783,6 @@ onUnmounted(() => {
   margin-right: 20px;
 }
 
-/* Мобильная адаптация */
 @media (max-width: 768px) {
   .b1 {
     height: 100vh;
@@ -1015,9 +1014,7 @@ onUnmounted(() => {
   }
 }
 
-/* Дополнительные улучшения для мобильных */
 @media (max-width: 768px) {
-  /* Улучшение читаемости текста */
   .b2-text p,
   .b3-text p,
   .b4 p,
@@ -1025,13 +1022,11 @@ onUnmounted(() => {
     line-height: 1.6;
   }
 
-  /* Оптимизация кнопок для касания */
   .btn {
     min-height: 48px;
     touch-action: manipulation;
   }
 
-  /* Улучшение формы */
   .form-project textarea {
     min-height: 120px;
   }
@@ -1041,26 +1036,22 @@ onUnmounted(() => {
     border-radius: 0;
   }
 
-  /* Оптимизация баннера календаря */
   .banner-calendar p {
     font-size: 14px;
 
     padding: 0 10px;
   }
 
-  /* Улучшение навигации */
   .content button.trigger {
     position: relative;
     z-index: 10;
   }
 
-  /* Оптимизация изображений */
   .b2-img img,
   .b5-img img {
     border-radius: 0;
   }
 
-  /* Улучшение отступов */
   .main-container {
     overflow-x: hidden;
   }

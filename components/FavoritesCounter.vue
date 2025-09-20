@@ -5,11 +5,6 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
-
 // Функциональность избранного с cookies
-const { getFavoritesCount } = useFavorites();
-
-// Реактивный счетчик избранного
-const favoritesCount = computed(() => getFavoritesCount());
+const { favoritesCount } = useFavorites();
 </script>

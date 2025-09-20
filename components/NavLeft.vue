@@ -29,10 +29,9 @@
             <ul>
               <NuxtLink class="main-link" to="/">О компании</NuxtLink>
               <li>
-                <NuxtLink class="sub-link" to="/">Наш подход</NuxtLink>
-              </li>
-              <li>
-                <NuxtLink class="sub-link" to="/">Документация</NuxtLink>
+                <NuxtLink class="sub-link" to="/#about-index"
+                  >Наш подход</NuxtLink
+                >
               </li>
             </ul>
             <ul>
@@ -43,12 +42,9 @@
                 >
               </li>
               <li>
-                <NuxtLink class="sub-link" to="/contacts"
-                  >Наша команда</NuxtLink
+                <NuxtLink class="sub-link" to="/contacts#contact-map"
+                  >Локация</NuxtLink
                 >
-              </li>
-              <li>
-                <NuxtLink class="sub-link" to="/contacts">Локация</NuxtLink>
               </li>
             </ul>
           </ul>

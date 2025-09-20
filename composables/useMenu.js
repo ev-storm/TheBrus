@@ -8,12 +8,8 @@ export const useMenu = (menuType = "left") => {
   const eventName = menuType === "left" ? "toggleMenu" : "toggleRightMenu";
 
   const openMenu = () => {
-    console.log(
-      `useMenu openMenu вызвана для ${menuType}, eventName: ${eventName}`
-    );
     isOpen.value = true;
 
-    // Обновляем глобальное состояние через useMenuManager
     if (menuType === "right") {
       const { openRightMenu } = useMenuManager();
       openRightMenu();
@@ -21,14 +17,11 @@ export const useMenu = (menuType = "left") => {
       const { openLeftMenu } = useMenuManager();
       openLeftMenu();
     }
-
-    console.log(`useMenu событие ${eventName} отправлено`);
   };
 
   const closeMenu = () => {
     isOpen.value = false;
 
-    // Обновляем глобальное состояние через useMenuManager
     if (menuType === "right") {
       const { closeRightMenu } = useMenuManager();
       closeRightMenu();
@@ -51,12 +44,10 @@ export const useMenu = (menuType = "left") => {
   };
 
   const handleClickOutside = (event) => {
-    // Если меню закрыто, не обрабатываем клики
     if (!isOpen.value) {
       return;
     }
 
-    // Не закрываем меню, если клик по кнопке trigger или её дочерним элементам
     if (
       event.target.classList.contains("trigger") ||
       event.target.closest(".trigger")
@@ -64,7 +55,6 @@ export const useMenu = (menuType = "left") => {
       return;
     }
 
-    // Не закрываем меню, если клик по кнопке "Заказать" или её дочерним элементам
     if (
       event.target.classList.contains("order-btn") ||
       event.target.closest(".order-btn")
@@ -72,7 +62,6 @@ export const useMenu = (menuType = "left") => {
       return;
     }
 
-    // Не закрываем меню, если клик по кнопке "Изменить планировку" или её дочерним элементам
     if (
       event.target.classList.contains("swap-plan") ||
       event.target.closest(".swap-plan")
@@ -80,7 +69,6 @@ export const useMenu = (menuType = "left") => {
       return;
     }
 
-    // Закрываем меню только если клик вне его области
     if (menuRef.value && !menuRef.value.contains(event.target)) {
       closeMenu();
     }
@@ -108,7 +96,7 @@ export const useMenu = (menuType = "left") => {
     window.addEventListener("resize", updatePosition);
     window.addEventListener("scroll", updatePosition);
     window.addEventListener(eventName, handleToggleMenu);
-    // Добавляем обработчик click outside с задержкой, чтобы избежать конфликтов
+
     setTimeout(() => {
       document.addEventListener("click", handleClickOutside, { passive: true });
     }, 200);

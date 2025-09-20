@@ -7,10 +7,8 @@ import Banner from "~/components/Banner.vue";
 import Switch from "~/components/Switch.vue";
 import PhoneMask from "~/components/PhoneMask.vue";
 
-// Импортируем composable для отправки почты
 const { sendEmail, isLoading, error, success, resetForm } = useEmailForm();
 
-// Данные форм
 const contactForm = ref({
   name: "",
   phone: "",
@@ -28,30 +26,26 @@ const partnerForm = ref({
 const isPolicyAccepted = ref(false);
 
 const togglePolicy = () => {
-  console.log("togglePolicy called, current value:", isPolicyAccepted.value);
   isPolicyAccepted.value = !isPolicyAccepted.value;
-  console.log("togglePolicy new value:", isPolicyAccepted.value);
 };
 
-// Баннер уведомлений
 const showBanner = ref(false);
 const bannerMessage = ref("");
 const bannerType = ref("success");
 
-// Отслеживаем изменения error и success
 watch([error, success], ([newError, newSuccess]) => {
   if (newError) {
     bannerMessage.value = newError;
     bannerType.value = "error";
     showBanner.value = true;
   } else if (newSuccess) {
-    bannerMessage.value = "Заявка отправлена успешно!";
+    bannerMessage.value =
+      "<h3>Получили ваше обращение!</h3><span>Мы в офисе уже боремся, кому из менеждеров повезет пообщаться с таким замечательным человеком</span>";
     bannerType.value = "success";
     showBanner.value = true;
   }
 });
 
-// Функции отправки форм
 const handleContactSubmit = async () => {
   await sendEmail(contactForm.value);
   if (success.value) {
@@ -63,16 +57,14 @@ const fileUpload = ref(null);
 
 const handlePartnerSubmit = async () => {
   if (!isPolicyAccepted.value) {
-    console.log("Policy not accepted");
     return;
   }
 
   const emailData = {
     ...partnerForm.value,
-    formType: "partnership", // Тип формы для темы письма
+    formType: "partnership",
   };
 
-  // Получаем данные файла если есть
   const fileData =
     fileUpload.value && fileUpload.value.selectedFile
       ? {
@@ -185,7 +177,7 @@ useHead({
       </div>
     </div>
     <div class="b6">
-      <div class="map-title">
+      <div class="map-title" id="contact-map">
         <h1>Центральный офис</h1>
         <p>
           <Copy text="ул. Ленинская Слобода, 26, стр. 28, Москва" />

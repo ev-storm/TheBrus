@@ -5,15 +5,12 @@ import { Navigation, Pagination, Autoplay } from "swiper/modules";
 import ProductCard from "./ProductCard.vue";
 import products from "~/data/products.js";
 
-// Импортируем стили Swiper
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 
-// Берем первые 5 продуктов
 const sliderProducts = products.slice(0, 5);
 
-// Настройки Swiper
 const swiperModules = [Navigation, Pagination, Autoplay];
 
 const swiperOptions = {
@@ -57,11 +54,8 @@ const onSwiper = (swiper) => {
   swiperRef.value = swiper;
 };
 
-const onSlideChange = () => {
-  // Можно добавить дополнительную логику при смене слайда
-};
+const onSlideChange = () => {};
 
-// Функции для управления слайдером
 const nextSlide = () => {
   if (swiperRef.value) {
     swiperRef.value.slideNext();
@@ -78,7 +72,10 @@ const prevSlide = () => {
 <template>
   <div class="slider-cart-con">
     <div class="slider-title">
-      <h1>Наши проекты</h1>
+      <NuxtLink to="/portfolio?tab=order" data-v-16b53fac=""
+        ><h1>Наши проекты</h1></NuxtLink
+      >
+
       <div class="slider-btn">
         <button @click="prevSlide" class="nav-btn">
           <svg

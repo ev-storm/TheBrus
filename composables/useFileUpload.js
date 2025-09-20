@@ -29,12 +29,6 @@ export const useFileUpload = () => {
     }
 
     selectedFile.value = file;
-    console.log(
-      "Выбран файл:",
-      file.name,
-      "Размер:",
-      (file.size / 1024 / 1024).toFixed(2) + "MB"
-    );
   };
 
   // Преобразование файла в base64 для отправки

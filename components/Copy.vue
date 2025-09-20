@@ -53,11 +53,8 @@ const handleCopy = async () => {
 
   const result = await copyToClipboard(props.text);
   if (result.success) {
-    console.log("Скопировано в буфер обмена:", props.text);
-    // Показываем баннер уведомления
     showBanner.value = true;
   } else {
-    console.error("Ошибка копирования:", result.error);
   }
 };
 </script>

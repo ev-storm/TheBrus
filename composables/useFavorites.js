@@ -1,3 +1,5 @@
+import { computed } from "vue";
+
 export const useFavorites = () => {
   // Используем useCookie для SSR-совместимого хранения
   const favoritesCookie = useCookie("favorites", {
@@ -13,6 +15,22 @@ export const useFavorites = () => {
   if (!Array.isArray(favoritesCookie.value)) {
     favoritesCookie.value = [];
   }
+
+  // Функция для валидации избранного (очистка несуществующих ID)
+  const validateFavorites = (availableIds) => {
+    if (!Array.isArray(favoritesCookie.value)) {
+      favoritesCookie.value = [];
+      return;
+    }
+
+    const validFavorites = favoritesCookie.value.filter((id) =>
+      availableIds.includes(id)
+    );
+
+    if (validFavorites.length !== favoritesCookie.value.length) {
+      favoritesCookie.value = validFavorites;
+    }
+  };
 
   // Функция для добавления/удаления из избранного
   const toggleFavorite = (itemId) => {
@@ -41,14 +59,13 @@ export const useFavorites = () => {
     return favorites.includes(itemId);
   };
 
-  // Функция для получения количества избранных
-  const getFavoritesCount = () => {
-    // Убеждаемся, что favoritesCookie.value является массивом
+  // Реактивное вычисляемое свойство для количества избранных
+  const favoritesCount = computed(() => {
     const favorites = Array.isArray(favoritesCookie.value)
       ? favoritesCookie.value
       : [];
     return favorites.length;
-  };
+  });
 
   // Функция для очистки избранного
   const clearFavorites = () => {
@@ -59,7 +76,8 @@ export const useFavorites = () => {
     favorites: favoritesCookie,
     toggleFavorite,
     isFavorite,
-    getFavoritesCount,
+    favoritesCount,
     clearFavorites,
+    validateFavorites,
   };
 };

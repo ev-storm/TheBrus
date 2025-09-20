@@ -2,7 +2,11 @@
   <div class="footer-con">
     <footer class="footer">
       <div class="footer-logo">
-        <img src="/svg/logo/logo-nav.svg" alt="" />
+        <NuxtImg
+          src="/svg/logo/logo-nav.svg"
+          alt="TheBrus логотип"
+          loading="lazy"
+        />
         <p>Все права защищены<br />2025</p>
       </div>
       <div class="footer-nav">
@@ -20,14 +24,14 @@
               >
             </li>
           </ul>
-          <ul>
+          <!-- <ul>
             <NuxtLink class="main-link" to="/constructor">Конструктор</NuxtLink>
             <li>
               <NuxtLink class="sub-link" to="/constructor"
                 >Создать индивидуальный проект</NuxtLink
               >
             </li>
-          </ul>
+          </ul> -->
         </div>
         <div class="nav-item">
           <ul>
@@ -37,11 +41,11 @@
                 >Реквезиты компании</NuxtLink
               >
             </li>
+
             <li>
-              <NuxtLink class="sub-link" to="/contacts">Наша команда</NuxtLink>
-            </li>
-            <li>
-              <NuxtLink class="sub-link" to="/contacts">Локация</NuxtLink>
+              <NuxtLink class="sub-link" to="/contacts#contact-map"
+                >Локация</NuxtLink
+              >
             </li>
           </ul>
         </div>
@@ -49,10 +53,9 @@
           <ul>
             <NuxtLink class="main-link" to="/">О компании</NuxtLink>
             <li>
-              <NuxtLink class="sub-link" to="/">Наш подход</NuxtLink>
-            </li>
-            <li>
-              <NuxtLink class="sub-link" to="/">Документация</NuxtLink>
+              <NuxtLink class="sub-link" to="/#about-index"
+                >Наш подход</NuxtLink
+              >
             </li>
           </ul>
         </div>
@@ -112,7 +115,8 @@ watch([error, success], ([newError, newSuccess]) => {
     bannerType.value = "error";
     showBanner.value = true;
   } else if (newSuccess) {
-    bannerMessage.value = "Заявка отправлена успешно!";
+    bannerMessage.value =
+      "<h3>Получили ваше обращение!</h3><span>Мы в офисе уже боремся, кому из менеждеров повезет пообщаться с таким замечательным человеком</span>";
     bannerType.value = "success";
     showBanner.value = true;
   }
@@ -175,7 +179,7 @@ const handleSubmit = async () => {
   display: flex;
   width: 50%;
   justify-content: space-between;
-  align-items: stretch;
+  align-items: start;
 }
 .sub-link {
   color: #a0a0a0;
