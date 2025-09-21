@@ -38,7 +38,7 @@ const progressSafe = computed(() => {
 <template>
   <div v-if="show" class="overlay">
     <div class="center">
-      <NuxtImg
+      <img
         src="/svg/loader/1.svg"
         alt="Загрузка"
         class="spinner"

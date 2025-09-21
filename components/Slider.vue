@@ -19,19 +19,14 @@
       @mouseenter="onSlideHover(index)"
       @mouseleave="onSlideLeave"
     >
-      <NuxtImg
+      <img
         class="slide-img"
         :src="slide.img"
         :alt="slide.text"
         loading="lazy"
-        quality="85"
       />
       <div class="slide-text-con">
-        <NuxtImg
-          :src="slide.imgText"
-          :alt="slide.text + ' текст'"
-          loading="lazy"
-        />
+        <img :src="slide.imgText" :alt="slide.text + ' текст'" loading="lazy" />
         <span>{{ slide.text }}</span>
       </div>
     </swiper-slide>

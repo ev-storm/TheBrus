@@ -1,7 +1,7 @@
 <template>
   <div class="main-container">
     <div class="b1">
-      <NuxtImg src="/img/work.svg" alt="Работа в процессе" loading="lazy" />
+      <img src="/img/work.svg" alt="Работа в процессе" loading="lazy" />
     </div>
   </div>
 </template>

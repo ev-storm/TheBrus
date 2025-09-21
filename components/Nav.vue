@@ -8,17 +8,16 @@
       }
     "
   >
-    <NuxtImg src="/svg/button/phone.svg" alt="Телефон" loading="lazy" />
+    <img src="/svg/button/phone.svg" alt="Телефон" loading="lazy" />
   </button>
   <nav class="nav" :class="{ scrolled: isScrolled }">
     <div class="nav-container">
       <div class="nav-logo" @click="goToHome">
-        <NuxtImg
+        <img
           src="/svg/logo/logo-nav.svg"
           alt="TheBrus"
           class="logo"
           loading="eager"
-          preload
         />
       </div>
       <div class="nav-button">
@@ -40,7 +39,7 @@
             }
           "
         >
-          <NuxtImg src="/svg/button/mail-nav.svg" alt="Email" loading="lazy" />
+          <img src="/svg/button/mail-nav.svg" alt="Email" loading="lazy" />
         </button>
       </div>
     </div>

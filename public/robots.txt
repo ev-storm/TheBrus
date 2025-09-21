@@ -1,20 +1,16 @@
-# Robots.txt для thebrus.ru
-# Разрешаем всем роботам индексировать сайт
-User-Agent: *
+User-agent: *
 Allow: /
 
-# Указываем расположение карты сайта
 Sitemap: https://thebrus.ru/sitemap.xml
 
-# Специальные настройки для основных поисковых систем
-User-Agent: Googlebot
+User-agent: Googlebot
 Allow: /
-Crawl-Delay: 1
+Crawl-delay: 1
 
-User-Agent: Bingbot
+User-agent: Bingbot
 Allow: /
-Crawl-Delay: 1
+Crawl-delay: 1
 
-User-Agent: YandexBot
+User-agent: YandexBot
 Allow: /
-Crawl-Delay: 1
+Crawl-delay: 1

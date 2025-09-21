@@ -5,7 +5,7 @@ export function loadYMaps3(
   lang = "ru_RU"
 ): Promise<typeof window.ymaps3> {
   console.log("loadYMaps3 called with API key:", apiKey);
-  
+
   if (typeof window === "undefined") {
     return Promise.reject(new Error("YMaps can be loaded only in browser"));
   }
@@ -21,10 +21,10 @@ export function loadYMaps3(
   const url = `https://api-maps.yandex.ru/v3/?apikey=${encodeURIComponent(
     apiKey
   )}&lang=${lang}`;
-  
+
   console.log("Loading YMaps v3 from URL:", url);
   console.log("Encoded API key:", encodeURIComponent(apiKey));
-  
+
   // Проверим, что URL валидный
   try {
     new URL(url);
@@ -48,7 +48,7 @@ export function loadYMaps3(
       console.error("Script readyState:", script.readyState);
       reject(new Error(`Failed to load YMaps v3 script: ${error}`));
     };
-    
+
     // Добавим таймаут
     setTimeout(() => {
       if (!(window as any).ymaps3) {
@@ -56,7 +56,7 @@ export function loadYMaps3(
         reject(new Error("YMaps v3 script load timeout"));
       }
     }, 10000);
-    
+
     document.head.appendChild(script);
   });
 

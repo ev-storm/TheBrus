@@ -32,7 +32,7 @@ export const useEmailForm = () => {
         }
       }
 
-      const response = await $fetch("/api/send-email", {
+      const response = await $fetch("/send-email.php", {
         method: "POST",
         body: emailData,
       });

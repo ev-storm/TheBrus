@@ -2,7 +2,7 @@
   <div class="footer-con">
     <footer class="footer">
       <div class="footer-logo">
-        <NuxtImg
+        <img
           src="/svg/logo/logo-nav.svg"
           alt="TheBrus логотип"
           loading="lazy"

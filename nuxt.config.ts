@@ -2,7 +2,8 @@
 export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   devtools: { enabled: false },
-  modules: ["@nuxt/image"],
+  modules: [],
+  ssr: false, // Отключаем SSR для статического хостинга
   css: ["~/assets/css/fonts.css", "~/assets/css/main.css"],
   runtimeConfig: {
     ymapsApiKey:
@@ -12,32 +13,14 @@ export default defineNuxtConfig({
         process.env.YMAPS_API_KEY || "2daa9fb2-779c-4369-b15e-8ba3c97897c5",
     },
   },
-  image: {
-    // Оптимизация изображений
-    quality: 80,
-    format: ["webp", "avif", "jpeg", "png"],
-    screens: {
-      xs: 320,
-      sm: 640,
-      md: 768,
-      lg: 1024,
-      xl: 1280,
-      xxl: 1536,
-    },
-    densities: [1, 2],
-    // Lazy loading по умолчанию
-    loading: "lazy",
-    // Предзагрузка критических изображений
-    preload: false,
-    // Кэширование
-    cache: true,
-    // Оптимизация для продакшена
-    domains: ["thebrus.ru"],
-    // Провайдер для локальных изображений
-    providers: {
-      local: {
-        provider: "ipx",
-      },
+  nitro: {
+    preset: "static", // Статическая генерация для Apache хостинга
+    routeRules: {
+      "/": { prerender: true },
+      "/portfolio": { prerender: true },
+      "/contacts": { prerender: true },
+      "/constructor": { prerender: true },
+      "/house": { prerender: true },
     },
   },
   app: {
@@ -186,6 +169,25 @@ export default defineNuxtConfig({
         },
       ],
       link: [
+        {
+          rel: "icon",
+          type: "image/x-icon",
+          href: "/favicon.ico",
+        },
+        {
+          rel: "shortcut icon",
+          type: "image/x-icon",
+          href: "/favicon.ico",
+        },
+        {
+          rel: "apple-touch-icon",
+          href: "/favicon.ico",
+        },
+        {
+          rel: "sitemap",
+          type: "application/xml",
+          href: "/sitemap.xml",
+        },
         {
           rel: "preload",
           href: "/fonts/Montserrat-VariableFont_wght.ttf",

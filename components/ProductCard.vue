@@ -278,7 +278,7 @@ function handleOrder() {
         <div class="hover-zone right" @mouseenter="handleEnter(2)"></div>
       </div>
       <div class="badge">
-        <NuxtImg
+        <img
           src="/svg/logo/logo.svg"
           alt="TheBrus логотип"
           loading="lazy"
@@ -399,13 +399,12 @@ function handleOrder() {
         ></div>
 
         <!-- Изображение -->
-        <NuxtImg
+        <img
           v-if="modalImages[modalImageIndex]"
           :src="modalImages[modalImageIndex]"
           :alt="title"
           class="modal-image"
           loading="lazy"
-          quality="90"
         />
 
         <!-- Стрелки навигации -->
@@ -472,13 +471,12 @@ function handleOrder() {
         ></div>
 
         <!-- Изображение плана -->
-        <NuxtImg
+        <img
           v-if="planImages[planModalIndex]"
           :src="planImages[planModalIndex]"
           :alt="title + ' - План'"
           class="modal-image"
           loading="lazy"
-          quality="90"
         />
 
         <!-- Стрелки навигации -->

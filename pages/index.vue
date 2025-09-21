@@ -311,11 +311,10 @@ onUnmounted(() => {
           </button>
         </div>
         <div class="b2-img">
-          <NuxtImg
+          <img
             src="/img/index/1.png"
             alt="Главное изображение"
             loading="lazy"
-            quality="85"
           />
         </div>
       </div>
@@ -338,7 +337,7 @@ onUnmounted(() => {
           работе на следующий же день после подписания договора.
         </p>
       </div>
-      <NuxtImg
+      <img
         class="b3-back"
         src="/img/index/2.svg"
         alt="Фоновая графика"
@@ -412,12 +411,7 @@ onUnmounted(() => {
           </form>
         </div>
         <div class="b5-img">
-          <NuxtImg
-            src="/img/index/5.png"
-            alt="Изображение секции"
-            loading="lazy"
-            quality="85"
-          />
+          <img src="/img/index/5.png" alt="Изображение секции" loading="lazy" />
         </div>
       </div>
     </div>

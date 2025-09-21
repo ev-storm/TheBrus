@@ -1,24 +1,40 @@
-# Запрет доступа ботам
+# Принудительный редирект с HTTP на HTTPS (только для основного домена)
 RewriteEngine On
+RewriteCond %{SERVER_PORT} 80
+RewriteCond %{HTTP_HOST} ^(www\.)?thebrus\.ru$ [NC]
+RewriteRule ^(.*)$ https://thebrus.ru/$1 [L,R=301]
 
-# Блокировка по User-Agent
-RewriteCond %{HTTP_USER_AGENT} (bot|crawler|spider|scraper|scanner|harvester|extractor) [NC]
-RewriteRule .* - [F,L]
-
-# Блокировка известных ботов
-RewriteCond %{HTTP_USER_AGENT} (Googlebot|Bingbot|YandexBot|Slurp|DuckDuckBot|Baiduspider|facebookexternalhit|Twitterbot|LinkedInBot|WhatsApp|TelegramBot) [NC]
-RewriteRule .* - [F,L]
-
-# Дополнительные заголовки для запрета индексации
-Header always set X-Robots-Tag "noindex, nofollow, noarchive, nosnippet, noimageindex"
-
-# Блокировка доступа к служебным файлам
-<Files "robots.txt">
-    Header set X-Robots-Tag "noindex, nofollow"
-</Files>
-
-# Блокировка доступа к конфигурационным файлам
-<FilesMatch "\.(htaccess|htpasswd|ini|log|sh|inc|bak)$">
+# Защита конфигурационных файлов
+<Files "config.php">
     Order Allow,Deny
     Deny from all
-</FilesMatch>
+</Files>
+
+# Разрешаем доступ к PHP файлам для обработки форм
+<Files "send-email.php">
+    Order Allow,Deny
+    Allow from all
+</Files>
+
+# Обеспечиваем доступ к robots.txt и sitemap.xml
+<Files "robots.txt">
+    Order Allow,Deny
+    Allow from all
+    Header set Content-Type "text/plain"
+</Files>
+
+<Files "sitemap.xml">
+    Order Allow,Deny
+    Allow from all
+    Header set Content-Type "application/xml"
+</Files>
+
+# Общие настройки безопасности
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options nosniff
+    Header always set X-Frame-Options DENY
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    # Header always set Content-Security-Policy "upgrade-insecure-requests"
+</IfModule>
